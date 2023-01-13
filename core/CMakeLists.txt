@@ -4,4 +4,4 @@ set(CORE_SOURCE
     js_context.cc
     converter.cc)
 
-add_library(nica_core ${CORE_SOURCE})
+add_library(libcore ${CORE_SOURCE})

@@ -8,10 +8,12 @@ add_definitions(-DV8_ENABLE_SANDBOX)
 
 include_directories(
     ${nica}
+    ${nica}/base
     ${nica}/third_party/v8/include
     ${nica}/third_party/test
 )
 
+add_subdirectory(base)
 add_subdirectory(core)
 
 link_directories(
@@ -27,5 +29,6 @@ add_executable(${PROJECT_NAME} ${nica}/test.cc)
 
 target_link_libraries(${PROJECT_NAME} 
     ${V8_LIBS}
-    nica_core)
+    libbase
+    libcore)
 
