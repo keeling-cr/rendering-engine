@@ -1,4 +1,8 @@
 set(BASE_SOURCE 
+    files/file_path.cc
+    files/file_util.cc
+    files/file.cc
+    files/scoped_file.cc
     logging.cc
     strings/string_number_conversions.cc
     strings/string_util.cc
@@ -21,13 +25,15 @@ if (APPLE)
     )
 
     list(APPEND BASE_SOURCE
-        "mac/close_nocancel.cc"
-        "mac/foundation_util.mm"
-        "mac/mach_logging.cc"
-        "mac/scoped_mach_port.cc"
-        "mac/scoped_mach_vm.cc"
-        "mac/scoped_nsautorelease_pool.mm"
-        "strings/sys_string_conversions_mac.mm"
+        files/file_util_posix.cc
+        files/file_posix.cc
+        mac/close_nocancel.cc
+        mac/foundation_util.mm
+        mac/mach_logging.cc
+        mac/scoped_mach_port.cc
+        mac/scoped_mach_vm.cc
+        mac/scoped_nsautorelease_pool.mm
+        strings/sys_string_conversions_mac.mm
     )
 endif ()
 
