@@ -1,10 +1,13 @@
 #include <cstdio>
 #include <string>
 
+#include "base/files/file_util.h"
+#include "base/logging.h"
 #include "core/js_runtime.h"
 #include "core/js_isolate.h"
 #include "core/js_context.h"
 #include "core/converter.h"
+
 namespace nica {
 
 JSRuntime::Scope::Scope(JSRuntime* runtime)
@@ -47,6 +50,7 @@ void JSRuntime::CreateJSContext() {
     
 void JSRuntime::EvaluateJavascriptSource(const std::string& source) {
     v8::Isolate* isolate = js_isolate_->isolate();
+    v8::HandleScope handle_scope(isolate);
     v8::Local<v8::Context> context = js_context_->context();
     v8::TryCatch try_catch(isolate);
 
@@ -58,6 +62,15 @@ void JSRuntime::EvaluateJavascriptSource(const std::string& source) {
     // Convert the result to an UTF8 string and print it.
     v8::String::Utf8Value utf8(isolate, result);
     std::cout << *utf8 << std::endl;
+}
+
+void JSRuntime::EvaluateJavascriptFile(const base::FilePath& js_file_path) {
+    std::string source;
+    if (!base::ReadFileToString(js_file_path, &source)) {
+        LOG(FATAL) << "Unable to read " << js_file_path.value();
+        return;
+    }
+    EvaluateJavascriptSource(source);
 }
 
 } // namespace Nica

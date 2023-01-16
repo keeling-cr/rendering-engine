@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <cstdio>
 
+#include "base/files/file_path.h"
 #include "libplatform/libplatform.h"
 #include "v8.h"
 
@@ -20,6 +21,7 @@ class JSRuntime {
       JSRuntime& operator=(const JSRuntime&) = delete;
 
       void EvaluateJavascriptSource(const std::string& source);
+      void EvaluateJavascriptFile(const base::FilePath& js_file_path);
       JSContext* GetJSContext();
       JSIsolate* GetJSIsolate();
 

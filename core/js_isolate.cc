@@ -11,7 +11,6 @@ JSIsolate::JSIsolate() {
 }
 
 JSIsolate::~JSIsolate() {
-    isolate_->Dispose();
     isolate_ = nullptr;
 }
 
