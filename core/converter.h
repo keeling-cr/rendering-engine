@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "base/strings/string_piece.h"
 #include "v8-container.h"
 #include "v8-forward.h"
 #include "v8-isolate.h"
@@ -244,6 +245,14 @@ inline v8::Local<v8::String> StringToV8(
     const std::string& input) {
   return ConvertToV8(isolate, input).As<v8::String>();
 }
+
+// This crashes when input.size() > v8::String::kMaxLength.
+v8::Local<v8::String> StringToSymbol(v8::Isolate* isolate,
+                                    const base::StringPiece& val);
+
+// This crashes when input.size() > v8::String::kMaxLength.
+v8::Local<v8::String> StringToSymbol(v8::Isolate* isolate,
+                                    const base::StringPiece16& val);
 
 }  // namespace nica
 

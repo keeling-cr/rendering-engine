@@ -6,6 +6,7 @@ set(BASE_SOURCE
     logging.cc
     strings/string_number_conversions.cc
     strings/string_util.cc
+    strings/stringprintf.cc
     strings/utf_string_conversions.cc
     strings/utf_string_conversion_utils.cc
     third_party/icu/icu_utf.cc
@@ -39,7 +40,13 @@ endif ()
 
 if (APPLE)
     list(APPEND BASE_SOURCE
-        "posix/safe_strerror.cc"
+        posix/safe_strerror.cc
+    )
+endif ()
+
+if (WIN)
+    list(APPEND BASE_LIBRARIES
+        scoped_clear_last_error_win.cc
     )
 endif ()
 

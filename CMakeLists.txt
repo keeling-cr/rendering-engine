@@ -15,6 +15,7 @@ include_directories(
 
 add_subdirectory(base)
 add_subdirectory(core)
+add_subdirectory(binding)
 
 link_directories(
     ${nica}/third_party/v8/libs
@@ -30,5 +31,6 @@ add_executable(${PROJECT_NAME} ${nica}/test.cc)
 target_link_libraries(${PROJECT_NAME} 
     ${V8_LIBS}
     libbase
-    libcore)
+    libcore
+    libv8bind)
 

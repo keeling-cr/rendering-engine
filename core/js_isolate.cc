@@ -5,8 +5,8 @@ namespace nica {
 
 JSIsolate::JSIsolate() {
     v8::Isolate::CreateParams create_params;
-    create_params.array_buffer_allocator =
-        v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    v8::ArrayBuffer::Allocator* allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    create_params.array_buffer_allocator = allocator;
     isolate_ = v8::Isolate::New(create_params);
 }
 

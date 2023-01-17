@@ -7,6 +7,8 @@
 #include "core/js_isolate.h"
 #include "core/js_context.h"
 #include "core/converter.h"
+#include "core/try_catch.h"
+#include "binding/modules/console/console.h"
 
 namespace nica {
 
@@ -24,6 +26,7 @@ JSRuntime::JSRuntime() {
     v8::V8::Initialize();
     js_isolate_  = JSIsolate::Create();
     CreateJSContext();
+    InstallBuiltinModule();
 }
 
 JSRuntime::~JSRuntime() {
@@ -41,27 +44,55 @@ JSIsolate* JSRuntime::GetJSIsolate() {
 void JSRuntime::CreateJSContext() {
     v8::Isolate::Scope isolate_scope(js_isolate_->isolate());
     v8::HandleScope handle_scope(js_isolate_->isolate());
-    v8::Local<v8::Context> context =
-      v8::Context::New(js_isolate_->isolate());
+    v8::Isolate* isolate = js_isolate_->isolate(); 
 
-    js_context_ = JSContext::Create(js_isolate_->isolate());
+    v8::Local<v8::Context> context =
+      v8::Context::New(isolate);
+    js_context_ = JSContext::Create(isolate);
     js_context_->SetContext(context);
+}
+
+void JSRuntime::InstallBuiltinModule() {
+    // bind::Console::Register(js_isolate_->isolate());
+    v8::Isolate* isolate = js_isolate_->isolate(); 
+    v8::HandleScope handle_scope(isolate);
+    v8::Context::Scope context_scope(js_context_->context());
+
+    v8::Local<v8::Object> console_obj = bind::Console::AsV8Object(isolate);
+    v8::Local<v8::Context> context = js_context_->context(); 
+    context->Global()
+      ->Set(context, v8::String::NewFromUtf8Literal(isolate, "console"),
+            console_obj)
+      .FromJust();
 }
     
 void JSRuntime::EvaluateJavascriptSource(const std::string& source) {
     v8::Isolate* isolate = js_isolate_->isolate();
     v8::HandleScope handle_scope(isolate);
-    v8::Local<v8::Context> context = js_context_->context();
-    v8::TryCatch try_catch(isolate);
+    
+    v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
+    if (ctx.IsEmpty()) 
+        LOG(ERROR) << "keiling current context is empty";
 
-    v8::Local<v8::Script> script =
+    v8::Local<v8::Context> context = js_context_->context();
+    TryCatch try_catch(isolate);
+
+    auto maybe_script =
         v8::Script::Compile(
-            context, StringToV8(isolate, source)).ToLocalChecked();
-    // Run the script to get the result.
-    v8::Local<v8::Value> result = script->Run(context).ToLocalChecked();
-    // Convert the result to an UTF8 string and print it.
-    v8::String::Utf8Value utf8(isolate, result);
-    std::cout << *utf8 << std::endl;
+            context, StringToV8(isolate, source));
+    
+    v8::Local<v8::Script> script;
+    if (!maybe_script.ToLocal(&script)) {
+        CHECK(false) << try_catch.GetStackTrace();
+        return;
+    }
+
+    auto maybe = script->Run(context);
+    v8::Local<v8::Value> result;
+    if (!maybe.ToLocal(&result)) {
+        CHECK(false) << try_catch.GetStackTrace();
+        return;
+    }
 }
 
 void JSRuntime::EvaluateJavascriptFile(const base::FilePath& js_file_path) {

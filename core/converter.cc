@@ -239,4 +239,20 @@ std::string V8ToString(v8::Isolate* isolate, v8::Local<v8::Value> value) {
   return result;
 }
 
+v8::Local<v8::String> StringToSymbol(v8::Isolate* isolate,
+                                      const base::StringPiece& val) {
+  return String::NewFromUtf8(isolate, val.data(),
+                             v8::NewStringType::kInternalized,
+                             static_cast<uint32_t>(val.length()))
+      .ToLocalChecked();
+}
+
+v8::Local<v8::String> StringToSymbol(v8::Isolate* isolate,
+                                     const base::StringPiece16& val) {
+  return String::NewFromTwoByte(isolate,
+                                reinterpret_cast<const uint16_t*>(val.data()),
+                                v8::NewStringType::kInternalized, val.length())
+      .ToLocalChecked();
+}
+
 }  // namespace nica

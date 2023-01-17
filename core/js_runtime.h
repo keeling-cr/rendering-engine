@@ -42,6 +42,7 @@ class JSRuntime {
       friend class Scope;
 
       void CreateJSContext();
+      void InstallBuiltinModule();
 
       std::unique_ptr<JSIsolate> js_isolate_;
       std::unique_ptr<JSContext> js_context_;
