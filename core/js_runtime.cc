@@ -104,4 +104,13 @@ void JSRuntime::EvaluateJavascriptFile(const base::FilePath& js_file_path) {
     EvaluateJavascriptSource(source);
 }
 
+void JSRuntime::EvaluateJavascriptFile(const base::FilePath& js_file_path) {
+    std::string source;
+    if (!base::ReadFileToString(js_file_path, &source)) {
+        LOG(FATAL) << "Unable to read " << js_file_path.value();
+        return;
+    }
+    EvaluateJavascriptSource(source);
+}
+
 } // namespace Nica
