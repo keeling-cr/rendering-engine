@@ -22,15 +22,33 @@ void BoundLogMethodCallback(const v8::FunctionCallbackInfo<v8::Value>& info) {
       message += " ";
     message += *v8::String::Utf8Value(info.GetIsolate(), info[i]);
   }
-  LOG(ERROR) << "nica console message: " << message;
-}
 
-nica::WrapperInfo kWrapperInfo = {nica::kEmbedderNicaMain};
+  const auto level = static_cast<Console::ConsoleMessageLevel>(
+      info.Data().As<v8::Int32>()->Value());
+
+  switch (level) {
+    case Console::ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_VERBOSE:
+      LOG(INFO) << "nica console message: " << message;
+      break;
+    case Console::ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_FATAL:
+      LOG(FATAL) << "nica console message: " << message;
+      break;
+    case Console::ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_WARNING:
+      LOG(WARNING) << "nica console message: " << message;
+      break;
+    case Console::ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_ERROR:
+      LOG(ERROR) << "nica console message: " << message;
+      break;
+  }
+}
 
 }  // namespace
 
-v8::Local<v8::Object> Console::AsV8Object(v8::Isolate* isolate) {
-  v8::EscapableHandleScope handle_scope(isolate);
+void Console::Register(nica::JSIsolate* js_isolate, nica::JSContext* js_context) {
+  v8::Isolate* isolate = js_isolate->isolate();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = js_context->context();
+  v8::Context::Scope context_scope(context);
 
   v8::Local<v8::ObjectTemplate> templ = v8::ObjectTemplate::New(isolate);
 
@@ -39,9 +57,10 @@ v8::Local<v8::Object> Console::AsV8Object(v8::Isolate* isolate) {
     ConsoleMessageLevel level;
   } methods[] = {
       {"debug", ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_VERBOSE},
-      {"log", ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_INFO},
+      {"log", ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_VERBOSE},
       {"warn", ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_WARNING},
       {"error", ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_ERROR},
+      {"fatal", ConsoleMessageLevel::CONSOLE_MESSAGE_LEVEL_FATAL},
   };
 
   for (const auto& method : methods) {
@@ -51,9 +70,11 @@ v8::Local<v8::Object> Console::AsV8Object(v8::Isolate* isolate) {
         v8::Local<v8::Signature>(), 0, v8::ConstructorBehavior::kThrow);
     templ->Set(nica::StringToSymbol(isolate, method.name), function);
   }
-  v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
-  return handle_scope.Escape(
-      templ->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
+
+  context->Global()
+    ->Set(context, v8::String::NewFromUtf8Literal(isolate, "console"),
+          templ->NewInstance(isolate->GetCurrentContext()).ToLocalChecked())
+    .FromJust();
 }
 
 }  // namespace bind

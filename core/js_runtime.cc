@@ -53,17 +53,7 @@ void JSRuntime::CreateJSContext() {
 }
 
 void JSRuntime::InstallBuiltinModule() {
-    // bind::Console::Register(js_isolate_->isolate());
-    v8::Isolate* isolate = js_isolate_->isolate(); 
-    v8::HandleScope handle_scope(isolate);
-    v8::Context::Scope context_scope(js_context_->context());
-
-    v8::Local<v8::Object> console_obj = bind::Console::AsV8Object(isolate);
-    v8::Local<v8::Context> context = js_context_->context(); 
-    context->Global()
-      ->Set(context, v8::String::NewFromUtf8Literal(isolate, "console"),
-            console_obj)
-      .FromJust();
+    bind::Console::Register(js_isolate_.get(), js_context_.get());
 }
     
 void JSRuntime::EvaluateJavascriptSource(const std::string& source) {
@@ -93,15 +83,6 @@ void JSRuntime::EvaluateJavascriptSource(const std::string& source) {
         CHECK(false) << try_catch.GetStackTrace();
         return;
     }
-}
-
-void JSRuntime::EvaluateJavascriptFile(const base::FilePath& js_file_path) {
-    std::string source;
-    if (!base::ReadFileToString(js_file_path, &source)) {
-        LOG(FATAL) << "Unable to read " << js_file_path.value();
-        return;
-    }
-    EvaluateJavascriptSource(source);
 }
 
 void JSRuntime::EvaluateJavascriptFile(const base::FilePath& js_file_path) {
