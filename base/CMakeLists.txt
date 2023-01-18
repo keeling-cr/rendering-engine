@@ -10,6 +10,8 @@ set(BASE_SOURCE
     strings/utf_string_conversions.cc
     strings/utf_string_conversion_utils.cc
     third_party/icu/icu_utf.cc
+    time/time.cc
+    time/time_override.cc
     )
 
 if (APPLE)
