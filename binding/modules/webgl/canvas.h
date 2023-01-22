@@ -10,12 +10,18 @@
 namespace bind {
 
 class Canvas {
- public:
-  Canvas(int x, int y);
-  ~Canvas();
-  static void Register(nica::JSIsolate* js_isolate, nica::JSContext* js_context);
+  public:
+    Canvas(int width, int height);
+    ~Canvas();
+    static void Register(nica::JSIsolate* js_isolate, nica::JSContext* js_context);
+    void SetWidth(int width) { width_ = width; }
+    void SetHeight(int height) { height_ = height; } 
+    int width() { return width_; }
+    int height() { return height_; }
+  private:
 
-    int x_, y_;
+    int width_;
+    int height_;
 };
 
 } // namespace bind

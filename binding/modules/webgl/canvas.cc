@@ -28,17 +28,17 @@ void CanvasNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 
-void GetPointX(v8::Local<v8::String> property,
+void GetCanvasWidth(v8::Local<v8::String> property,
                const v8::PropertyCallbackInfo<v8::Value>& info) {
   v8::Local<v8::Object> self = info.Holder();
   v8::Local<v8::External> wrap =
       v8::Local<v8::External>::Cast(self->GetInternalField(0));
   void* ptr = wrap->Value();
-  int value = static_cast<Canvas*>(ptr)->x_;
+  int value = static_cast<Canvas*>(ptr)->width();
   info.GetReturnValue().Set(value);
 }
 
-void SetPointX(v8::Local<v8::String> property, v8::Local<v8::Value> value,
+void SetCanvasWidth(v8::Local<v8::String> property, v8::Local<v8::Value> value,
                const v8::PropertyCallbackInfo<void>& info) {
   v8::Isolate* isolate = info.GetIsolate();
   v8::Local<v8::Object> self = info.Holder();
@@ -47,12 +47,34 @@ void SetPointX(v8::Local<v8::String> property, v8::Local<v8::Value> value,
   void* ptr = wrap->Value();
   int x; 
   if (nica::ConvertFromV8(isolate, value, &x))
-    static_cast<Canvas*>(ptr)->x_ = x;
+    static_cast<Canvas*>(ptr)->SetWidth(x);
+}
+
+void GetCanvasHeight(v8::Local<v8::String> property,
+               const v8::PropertyCallbackInfo<v8::Value>& info) {
+  v8::Local<v8::Object> self = info.Holder();
+  v8::Local<v8::External> wrap =
+      v8::Local<v8::External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+  int value = static_cast<Canvas*>(ptr)->height();
+  info.GetReturnValue().Set(value);
+}
+
+void SetCanvasHeight(v8::Local<v8::String> property, v8::Local<v8::Value> value,
+               const v8::PropertyCallbackInfo<void>& info) {
+  v8::Isolate* isolate = info.GetIsolate();
+  v8::Local<v8::Object> self = info.Holder();
+  v8::Local<v8::External> wrap =
+      v8::Local<v8::External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+  int x; 
+  if (nica::ConvertFromV8(isolate, value, &x))
+    static_cast<Canvas*>(ptr)->SetHeight(x);
 }
 
 } // namespace
 
-Canvas::Canvas(int x, int y): x_(x), y_(y) {}
+Canvas::Canvas(int width, int height): width_(width), height_(height) {}
 
 Canvas::~Canvas() = default;
 
@@ -70,7 +92,10 @@ void Canvas::Register(nica::JSIsolate* js_isolate, nica::JSContext* js_context) 
     canvas_constructor_temp->ReadOnlyPrototype();
     
     canvas_constructor_temp->InstanceTemplate()->SetInternalFieldCount(1);
-    canvas_constructor_temp->InstanceTemplate()->SetAccessor(nica::StringToSymbol(isolate, "x"), GetPointX, SetPointX);
+    canvas_constructor_temp->InstanceTemplate()->SetAccessor(
+        nica::StringToSymbol(isolate, "width"), GetCanvasWidth, SetCanvasWidth);
+    canvas_constructor_temp->InstanceTemplate()->SetAccessor(
+        nica::StringToSymbol(isolate, "height"), GetCanvasHeight, SetCanvasHeight);
 
     v8::Local<v8::Function> canvas_constructor_func = 
         canvas_constructor_temp->GetFunction(context).ToLocalChecked();
