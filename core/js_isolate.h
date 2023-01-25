@@ -7,6 +7,8 @@
 #include "v8-isolate.h"
 namespace nica {
 
+class PerIsolateData;
+
 class JSIsolate {
   public:
     JSIsolate();
@@ -20,6 +22,7 @@ class JSIsolate {
 
   private:
     v8::Isolate* isolate_;
+    std::unique_ptr<PerIsolateData> isolate_data_;
 };
 
 }
