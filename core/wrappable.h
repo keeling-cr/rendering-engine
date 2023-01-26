@@ -18,7 +18,6 @@ void* FromV8Impl(v8::Isolate* isolate,
 
 class ObjectTemplateBuilder;
 
-// Non-template base class to share code between templates instances.
 class WrappableBase {
  public:
   WrappableBase(const WrappableBase&) = delete;
@@ -28,11 +27,8 @@ class WrappableBase {
   WrappableBase();
   virtual ~WrappableBase();
 
-  // Overrides of this method should be declared final and not overridden again.
   virtual ObjectTemplateBuilder GetObjectTemplateBuilder(v8::Isolate* isolate);
 
-  // Returns a readable type name that will be used in surfacing errors. The
-  // default implementation returns nullptr, which results in a generic error.
   virtual const char* GetTypeName();
 
   v8::MaybeLocal<v8::Object> GetWrapperImpl(v8::Isolate* isolate,
@@ -55,7 +51,6 @@ class Wrappable : public WrappableBase {
   Wrappable(const Wrappable&) = delete;
   Wrappable& operator=(const Wrappable&) = delete;
 
-  // Retrieve (or create) the v8 wrapper object corresponding to this object.
   v8::MaybeLocal<v8::Object> GetWrapper(v8::Isolate* isolate) {
     return GetWrapperImpl(isolate, &T::kWrapperInfo);
   }
@@ -73,7 +68,6 @@ struct ToV8ReturnsMaybe<
   static const bool value = true;
 };
 
-// This converter handles any subclass of Wrappable.
 template <typename T>
 struct Converter<T*,
                  typename std::enable_if<

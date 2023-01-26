@@ -5,12 +5,6 @@
 
 namespace nica {
 
-// Arguments is a wrapper around v8::FunctionCallbackInfo that integrates
-// with Converter to make it easier to marshall arguments and return values
-// between V8 and C++.
-//
-// If constructed instead with a v8::PropertyCallbackInfo, behaves as though a
-// function with no arguments had been called.
 class Arguments {
  public:
   Arguments();
@@ -82,13 +76,8 @@ class Arguments {
         .Set(v8_value);
   }
 
-  // Always check the return value whether the handle is empty before
-  // dereferencing the handle.
   v8::Local<v8::Value> PeekNext() const;
 
-  // Returns all arguments. Since this doesn't require any conversion, it
-  // cannot fail. This does not rely on or modify the current position in the
-  // array used by Get/PeekNext().
   std::vector<v8::Local<v8::Value>> GetAll() const;
 
   void ThrowError() const;
@@ -96,8 +85,6 @@ class Arguments {
 
   v8::Isolate* isolate() const { return isolate_; }
 
-  // Allows the function handler to distinguish between normal invocation
-  // and object construction.
   bool IsConstructCall() const;
 
  private:

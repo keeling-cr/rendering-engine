@@ -20,9 +20,6 @@ WrappableBase* WrappableFromV8(v8::Isolate* isolate,
   if (!info)
     return NULL;
 
-  // We don't further validate the type of the object, but assume it's derived
-  // from WrappableBase. We look up the pointer in a global registry, to make
-  // sure it's actually pointed to a valid life object.
   return static_cast<WrappableBase*>(
       obj->GetAlignedPointerFromInternalField(kEncodedValueIndex));
 }

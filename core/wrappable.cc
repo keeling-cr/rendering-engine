@@ -54,11 +54,7 @@ v8::MaybeLocal<v8::Object> WrappableBase::GetWrapperImpl(v8::Isolate* isolate,
   }
   CHECK_EQ(kNumberOfInternalFields, templ->InternalFieldCount());
   v8::Local<v8::Object> wrapper;
-  // |wrapper| may be empty in some extreme cases, e.g., when
-  // Object.prototype.constructor is overwritten.
   if (!templ->NewInstance(isolate->GetCurrentContext()).ToLocal(&wrapper)) {
-    // The current wrappable object will be no longer managed by V8. Delete this
-    // now.
     delete this;
     return v8::MaybeLocal<v8::Object>(wrapper);
   }
@@ -80,14 +76,9 @@ void* FromV8Impl(v8::Isolate* isolate, v8::Local<v8::Value> val,
   v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(val);
   WrapperInfo* info = WrapperInfo::From(obj);
 
-  // If this fails, the object is not managed by Gin. It is either a normal JS
-  // object that's not wrapping any external C++ object, or it is wrapping some
-  // C++ object, but that object isn't managed by Gin (maybe Blink).
   if (!info)
     return NULL;
 
-  // If this fails, the object is managed by Gin, but it's not wrapping an
-  // instance of the C++ class associated with wrapper_info.
   if (info != wrapper_info)
     return NULL;
 

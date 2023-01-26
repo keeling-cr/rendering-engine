@@ -18,10 +18,6 @@ template <typename T>
 v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(v8::Isolate* isolate,
                                                        std::function<T> callback,
                                                        const char* type_name) {
-  // We need to handle member function pointers case specially because the first
-  // parameter for callbacks to MFP should typically come from the the
-  // JavaScript "this" object the function was called on, not from the first
-  // normal parameter.
   InvokerOptions options;
   // todo(liqining): Suppoer non-member function using
   // std::is_member_function_pointer
@@ -33,8 +29,6 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(v8::Isolate* isolate,
 
 }  // namespace internal
 
-// ObjectTemplateBuilder provides a handy interface to creating
-// v8::ObjectTemplate instances with various sorts of properties.
 class ObjectTemplateBuilder {
  public:
   explicit ObjectTemplateBuilder(v8::Isolate* isolate);
@@ -45,18 +39,11 @@ class ObjectTemplateBuilder {
   ObjectTemplateBuilder(const ObjectTemplateBuilder& other);
   ~ObjectTemplateBuilder();
 
-  // It's against Google C++ style to return a non-const ref, but we take some
-  // poetic license here in order that all calls to Set() can be via the '.'
-  // operator and line up nicely.
   template<typename T>
   ObjectTemplateBuilder& SetValue(const base::StringPiece& name, T val) {
     return SetImpl(name, ConvertToV8(isolate_, val));
   }
 
-  // In the following methods, T and U can be function pointer, member function
-  // pointer, base::RepeatingCallback, or v8::FunctionTemplate. Most clients
-  // will want to use one of the first two options. Also see
-  // gin::CreateFunctionTemplate() for creating raw function templates.
   template<typename T>
   ObjectTemplateBuilder& SetMethod(const base::StringPiece& name,
                                    const T& callback) {
@@ -86,9 +73,6 @@ class ObjectTemplateBuilder {
         internal::CreateFunctionTemplate(isolate_, setter, type_name_));
   }
 
-  // Whereas SetProperty creates an accessor property, this creates what appears
-  // to be a data property but whose value is lazily computed the first time the
-  // [[Get]] operation occurs.
   template <typename T>
   ObjectTemplateBuilder& SetLazyDataProperty(const base::StringPiece& name,
                                              const T& getter) {
@@ -124,11 +108,8 @@ class ObjectTemplateBuilder {
 
   v8::Isolate* isolate_;
 
-  // If provided, |type_name_| will be used to give a user-friendly error
-  // message if a member function is invoked on the wrong type of object.
   const char* type_name_ = nullptr;
 
-  // ObjectTemplateBuilder should only be used on the stack.
   v8::Local<v8::ObjectTemplate> template_;
 };
 

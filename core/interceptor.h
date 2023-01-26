@@ -21,7 +21,6 @@ class NamedPropertyInterceptor {
 
   virtual v8::Local<v8::Value> GetNamedProperty(v8::Isolate* isolate,
                                                 const std::string& property);
-  // Return true if the set was interecepted.
   virtual bool SetNamedProperty(v8::Isolate* isolate,
                                 const std::string& property,
                                 v8::Local<v8::Value> value);
@@ -43,7 +42,6 @@ class IndexedPropertyInterceptor {
 
   virtual v8::Local<v8::Value> GetIndexedProperty(v8::Isolate* isolate,
                                                   uint32_t index);
-  // Return true if the set was interecepted.
   virtual bool SetIndexedProperty(v8::Isolate* isolate,
                                   uint32_t index,
                                   v8::Local<v8::Value> value);

@@ -38,8 +38,6 @@ struct CallbackParamTraits<const T*> {
   typedef T* LocalType;
 };
 
-// This simple base class is used so that we can share a single object template
-// among every CallbackHolder instance.
 class CallbackHolderBase {
  public:
   CallbackHolderBase(const CallbackHolderBase&) = delete;
@@ -91,8 +89,6 @@ bool GetNextArgument(Arguments* args,
   }
 }
 
-// For advanced use cases, we allow callers to request the unparsed Arguments
-// object and poke around in it directly.
 inline bool GetNextArgument(Arguments* args,
                             const InvokerOptions& invoker_options,
                             bool is_first,
@@ -108,7 +104,6 @@ inline bool GetNextArgument(Arguments* args,
   return true;
 }
 
-// It's common for clients to just need the isolate, so we make that easy.
 inline bool GetNextArgument(Arguments* args,
                             const InvokerOptions& invoker_options,
                             bool is_first,
@@ -117,13 +112,10 @@ inline bool GetNextArgument(Arguments* args,
   return true;
 }
 
-// Throws an error indicating conversion failure.
 void ThrowConversionError(Arguments* args,
                                      const InvokerOptions& invoker_options,
                                      size_t index);
 
-// Class template for extracting and storing single argument for callback
-// at position |index|.
 template <size_t index, typename ArgType>
 struct ArgumentHolder {
   using ArgLocalType = typename CallbackParamTraits<ArgType>::LocalType;
@@ -138,8 +130,6 @@ struct ArgumentHolder {
   }
 };
 
-// Class template for converting arguments from JavaScript to C++ and running
-// the callback with them.
 template <typename IndicesType, typename... ArgTypes>
 class Invoker;
 
@@ -147,10 +137,6 @@ template <size_t... indices, typename... ArgTypes>
 class Invoker<std::index_sequence<indices...>, ArgTypes...>
     : public ArgumentHolder<indices, ArgTypes>... {
  public:
-  // Invoker<> inherits from ArgumentHolder<> for each argument.
-  // C++ has always been strict about the class initialization order,
-  // so it is guaranteed ArgumentHolders will be initialized (and thus, will
-  // extract arguments from Arguments) in the right order.
   Invoker(Arguments* args, const InvokerOptions& invoker_options)
       : ArgumentHolder<indices, ArgTypes>(args, invoker_options)...,
         args_(args) {}
@@ -165,9 +151,6 @@ class Invoker<std::index_sequence<indices...>, ArgTypes...>
       std::invoke(callback, std::move(ArgumentHolder<indices, ArgTypes>::value)...));
   }
 
-  // In C++, you can declare the function foo(void), but you can't pass a void
-  // expression to foo. As a result, we must specialize the case of Callbacks
-  // that have the void return type.
   void DispatchToCallback(std::function<void(ArgTypes...)> callback) {
     std::invoke(callback, std::move(ArgumentHolder<indices, ArgTypes>::value)...);
   }
@@ -182,8 +165,6 @@ class Invoker<std::index_sequence<indices...>, ArgTypes...>
   Arguments* args_;
 };
 
-// DispatchToCallback converts all the JavaScript arguments to C++ types and
-// invokes the base::RepeatingCallback.
 template <typename Sig>
 struct Dispatcher {};
 

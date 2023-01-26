@@ -1,5 +1,5 @@
-#ifndef CORE_PUBLIC_GIN_EMBEDDERS_H_
-#define CORE_PUBLIC_GIN_EMBEDDERS_H_
+#ifndef CORE_EMBEDDERS_H_
+#define CORE_EMBEDDERS_H_
 
 #include <cstdint>
 
@@ -11,5 +11,5 @@ enum Embedder : uint16_t {
 
 }  // namespace nica
 
-#endif  // CORE_PUBLIC_GIN_EMBEDDERS_H_
+#endif  // CORE_EMBEDDERS_H_
 

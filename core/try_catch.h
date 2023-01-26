@@ -7,7 +7,6 @@
 
 namespace nica {
 
-// TryCatch is a convenient wrapper around v8::TryCatch.
 class TryCatch {
  public:
   explicit TryCatch(v8::Isolate* isolate);

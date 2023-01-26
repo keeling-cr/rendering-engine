@@ -50,11 +50,6 @@ void ThrowConversionError(Arguments* args,
     std::string error = "Illegal invocation";
     args->ThrowTypeError(error);
   } else {
-    // Otherwise, this failed parsing on a different argument.
-    // Arguments::ThrowError() will try to include appropriate information.
-    // Ideally we would include the expected c++ type in the error message
-    // here, too (which we can access via typeid(ArgType).name()), however we
-    // compile with no-rtti, which disables typeid.
     args->ThrowError();
   }
 }
