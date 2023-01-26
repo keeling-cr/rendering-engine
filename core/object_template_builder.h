@@ -16,17 +16,17 @@ namespace internal {
 
 template <typename T>
 v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(v8::Isolate* isolate,
-                                                       T callback,
+                                                       std::function<T> callback,
                                                        const char* type_name) {
   // We need to handle member function pointers case specially because the first
   // parameter for callbacks to MFP should typically come from the the
   // JavaScript "this" object the function was called on, not from the first
   // normal parameter.
   InvokerOptions options;
-  if (std::is_member_function_pointer<T>::value) {
-    options.holder_is_first_argument = true;
-    options.holder_type = type_name;
-  }
+  // todo(liqining): Suppoer non-member function using
+  // std::is_member_function_pointer
+  options.holder_is_first_argument = true;
+  options.holder_type = type_name;
   return ::nica::CreateFunctionTemplate(
       isolate, std::move(callback), std::move(options));
 }

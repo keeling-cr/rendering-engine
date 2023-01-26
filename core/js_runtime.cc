@@ -10,6 +10,7 @@
 #include "core/try_catch.h"
 #include "binding/modules/console/console.h"
 #include "binding/modules/webgl/canvas.h"
+#include "binding/modules/test/bind_test.h"
 
 namespace nica {
 
@@ -56,6 +57,7 @@ void JSRuntime::CreateJSContext() {
 void JSRuntime::InstallBuiltinModule() {
     bind::Console::Register(js_isolate_.get(), js_context_.get());
     bind::Canvas::Register(js_isolate_.get(), js_context_.get());
+    bind::BindTest::Register(js_isolate_.get(), js_context_.get());
 }
     
 void JSRuntime::EvaluateJavascriptSource(const std::string& source) {
