@@ -15,7 +15,7 @@ namespace nica {
 namespace internal {
 
 template <typename T>
-v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(v8::Isolate* isolate,
+v8::Local<v8::FunctionTemplate> CreateFunctionTemplateForObject(v8::Isolate* isolate,
                                                        std::function<T> callback,
                                                        const char* type_name) {
   InvokerOptions options;
@@ -48,29 +48,29 @@ class ObjectTemplateBuilder {
   ObjectTemplateBuilder& SetMethod(const base::StringPiece& name,
                                    const T& callback) {
     return SetImpl(
-        name, internal::CreateFunctionTemplate(isolate_, callback, type_name_));
+        name, internal::CreateFunctionTemplateForObject(isolate_, callback, type_name_));
   }
 
   template <typename T>
   ObjectTemplateBuilder& SetMethod(v8::Local<v8::Name> name,
                                    const T& callback) {
     return SetImpl(
-        name, internal::CreateFunctionTemplate(isolate_, callback, type_name_));
+        name, internal::CreateFunctionTemplateForObject(isolate_, callback, type_name_));
   }
 
   template<typename T>
   ObjectTemplateBuilder& SetProperty(const base::StringPiece& name,
                                      const T& getter) {
     return SetPropertyImpl(
-        name, internal::CreateFunctionTemplate(isolate_, getter, type_name_),
+        name, internal::CreateFunctionTemplateForObject(isolate_, getter, type_name_),
         v8::Local<v8::FunctionTemplate>());
   }
   template<typename T, typename U>
   ObjectTemplateBuilder& SetProperty(const base::StringPiece& name,
                                      const T& getter, const U& setter) {
     return SetPropertyImpl(
-        name, internal::CreateFunctionTemplate(isolate_, getter, type_name_),
-        internal::CreateFunctionTemplate(isolate_, setter, type_name_));
+        name, internal::CreateFunctionTemplateForObject(isolate_, getter, type_name_),
+        internal::CreateFunctionTemplateForObject(isolate_, setter, type_name_));
   }
 
   template <typename T>
