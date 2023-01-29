@@ -45,10 +45,22 @@ class FunctionTemplateBuilder {
                                    const T& callback) {
         return SetImpl(
             name, internal::CreateFunctionTemplateForFunction(isolate_, callback, type_name_));
-  }
+    }
+
+    template<typename T, typename U>
+    FunctionTemplateBuilder& SetProperty(const base::StringPiece& name,
+                                  const T& getter, const U& setter) {
+      return SetPropertyImpl(name, internal::CreateFunctionTemplateForFunction(isolate_, getter, type_name_),
+        internal::CreateFunctionTemplateForFunction(isolate_, setter, type_name_));
+   }
+  
   private:
     FunctionTemplateBuilder& SetImpl(const base::StringPiece& name,
                             v8::Local<v8::Data> val);
+    FunctionTemplateBuilder& SetPropertyImpl(
+      const base::StringPiece& name, v8::Local<v8::FunctionTemplate> getter,
+      v8::Local<v8::FunctionTemplate> setter);
+
     v8::Isolate* isolate_;
     const char* type_name_ = nullptr;
     v8::Local<v8::FunctionTemplate> template_;

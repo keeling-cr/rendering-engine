@@ -11,4 +11,4 @@ var b = new dyBindTest();
 b.test()
 console.log(b.testwithreturn())
 console.log(b.testwithparam(1, 1))
-console.log(b)
+console.log(b.width)

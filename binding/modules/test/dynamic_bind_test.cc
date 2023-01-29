@@ -33,8 +33,6 @@ void DynamicBindTestNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
 nica::WrapperInfo DynamicBindTest::kWrapperInfo = {
     nica::kEmbedderNicaMain};
 
-// bool DynamicBindTest::ok = true;
-
 DynamicBindTest::DynamicBindTest() = default;
 
 DynamicBindTest::~DynamicBindTest() = default;
@@ -53,10 +51,23 @@ int DynamicBindTest::TestBindWithParams(int a, int b) {
    return a + b;
 }
 
+void DynamicBindTest::SetWidth(int a) {
+   LOG(ERROR) << "keilingnica " << __func__; 
+}
+
+int DynamicBindTest::GetWidth() {
+   LOG(ERROR) << "keilingnica " << __func__; 
+   return 77;
+}
+
 nica::FunctionTemplateBuilder 
 DynamicBindTest::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
-    return nica::FunctionTemplateBuilder(isolate, DynamicBindTestNew);
+    return nica::FunctionTemplateBuilder(isolate, DynamicBindTestNew)
+            .SetMethod("test", std::function<void(DynamicBindTest*)>{&DynamicBindTest::TestBind})
+            .SetMethod("testwithreturn", std::function<int(DynamicBindTest*)>{&DynamicBindTest::TestBindWithReturn})
+            .SetMethod("testwithparam", std::function<int(DynamicBindTest*, int, int)>{&DynamicBindTest::TestBindWithParams})
+            .SetProperty("width", std::function<int(DynamicBindTest*)>{&DynamicBindTest::GetWidth}, std::function<void(DynamicBindTest*, int)>{&DynamicBindTest::SetWidth});
 }
 
 void DynamicBindTest::Register(
@@ -69,12 +80,9 @@ void DynamicBindTest::Register(
     v8::Local<v8::Object> global = context->Global();
     global
         ->Set(context, nica::StringToV8(isolate, "dyBindTest"),
-            GetFunctionTemplateBuilder(isolate)
-            .SetMethod("test", std::function<void(DynamicBindTest*)>{&DynamicBindTest::TestBind})
-            .SetMethod("testwithreturn", std::function<int(DynamicBindTest*)>{&DynamicBindTest::TestBindWithReturn})
-            .SetMethod("testwithparam", std::function<int(DynamicBindTest*, int, int)>{&DynamicBindTest::TestBindWithParams})
-            .Build()->GetFunction(context).ToLocalChecked())
-        .ToChecked();    
+            GetFunctionTemplateBuilder(isolate).
+            Build()->GetFunction(context).ToLocalChecked())
+            .ToChecked();    
 }
 
 } // namespace bind

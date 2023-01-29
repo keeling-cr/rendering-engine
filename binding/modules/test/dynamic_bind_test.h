@@ -33,6 +33,8 @@ class DynamicBindTest : public nica::Wrappable<DynamicBindTest> {
     void TestBind();
     int TestBindWithReturn();
     int TestBindWithParams(int a, int b);
+    void SetWidth(int a);
+    int GetWidth();
 };
 }
 
