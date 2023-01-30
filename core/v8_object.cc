@@ -10,11 +10,13 @@ void V8ObjectBase::SetInstance(
     v8::Handle<v8::Object> instance, 
     WrapperInfo* info,
     bool weak) {
-    instance_ = v8::Local<v8::Object>::New(isolate, instance);
-
+    v8::Local<v8::Object> instance_local = v8::Local<v8::Object>::New(isolate, instance);
+   
     int indices[] = {kWrapperInfoIndex, kEncodedValueIndex};
     void* values[] = {info, this};
-    instance_->SetAlignedPointerInInternalFields(2, indices, values);
+    instance_local->SetAlignedPointerInInternalFields(2, indices, values);
+
+    instance_.Reset(isolate, instance_local);
 // todo(liqining): v8 gc
 //   if (weak) {
 //     instance_.MarkIndependent();

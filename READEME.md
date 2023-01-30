@@ -14,3 +14,5 @@
     - remove wrapper info
     - optimize wrappable object
 4. jsruntime 提供生命周期钩子，确定每个时期需要做的事情
+5. persistent 对象提供垃圾回收机制
+6. 统一 v8object 和 wrapper 对象

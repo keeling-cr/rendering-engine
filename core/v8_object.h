@@ -20,7 +20,6 @@ class V8ObjectBase {
         
         v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(val);
         WrapperInfo* info = WrapperInfo::From(obj);
-        LOG(ERROR) << "keilingnica " << __func__;
         if (!info)
             return nullptr;
         
@@ -31,23 +30,22 @@ class V8ObjectBase {
     }
 
     inline v8::Local<v8::Object> GetV8Object() {
-      if (instance_.IsEmpty())
-        LOG(ERROR) << "instance empty";
-      return instance_;
+      return v8::Local<v8::Object>::New(isolate_, instance_);
     }
 
   protected:
-    V8ObjectBase() {}
+    V8ObjectBase(v8::Isolate* isolate): isolate_(isolate) {}
     virtual ~V8ObjectBase();
 
     void SetInstance(
         v8::Isolate* isolate, v8::Handle<v8::Object> instance, WrapperInfo* info, bool weak = false);
-
+    v8::Isolate* GetIsolate() { return isolate_; }
   private:
     V8ObjectBase(const V8ObjectBase&);
     V8ObjectBase& operator = (const V8ObjectBase&);
 
-    v8::Local<v8::Object> instance_;
+    v8::Persistent<v8::Object> instance_;
+    v8::Isolate* isolate_;
 
     static void WeakCallback(v8::Persistent<v8::Value> value, void* data);
 };
@@ -92,7 +90,7 @@ class V8Object : public V8ObjectBase {
   protected:
     V8Object(v8::Isolate* isolate, 
         v8::Handle<v8::Object> instance = v8::Local<v8::Object>())
-        : isolate_(isolate) {
+        : V8ObjectBase(isolate) {
         if (instance.IsEmpty()) {
             ConstructorMode<T> mode;
             instance = Create(isolate);
@@ -107,10 +105,6 @@ class V8Object : public V8ObjectBase {
             isolate->GetCurrentContext()).ToLocalChecked()
             ->NewInstance(isolate->GetCurrentContext()).ToLocalChecked();
     }  
-
-    v8::Isolate* GetIsolate() { return isolate_; }
-  private:
-    v8::Isolate* isolate_ = nullptr;
 };
 
 template <typename T>
@@ -129,7 +123,7 @@ struct Converter<T*,
     if (val == nullptr)
       return v8::Null(isolate);
     
-    v8::Local<v8::Object> instance = val->GetV8Object();
+         v8::Local<v8::Object> instance = val->GetV8Object();
     return v8::MaybeLocal<v8::Value>(instance);
   }
 
