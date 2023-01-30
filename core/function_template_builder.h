@@ -61,7 +61,7 @@ class FunctionTemplateBuilder {
       const base::StringPiece& name, v8::Local<v8::FunctionTemplate> getter,
       v8::Local<v8::FunctionTemplate> setter);
 
-    v8::Isolate* isolate_;
+    v8::Isolate* isolate_ = nullptr;
     const char* type_name_ = nullptr;
     v8::Local<v8::FunctionTemplate> template_;
 };

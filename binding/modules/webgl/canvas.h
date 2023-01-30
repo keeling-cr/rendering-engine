@@ -1,42 +1,44 @@
 #ifndef BINDING_MODULES_CANVAS_H_
 #define BINDING_MODULES_CANVAS_H_
 
+#include "binding/modules/webgl/webgl_rendering_context.h"
 #include "core/arguments.h"
 #include "core/function_template_builder.h"
 #include "core/wrappable.h"
 #include "core/converter.h"
-#include "v8-template.h"
 #include "core/js_isolate.h"
 #include "core/js_context.h"
+#include "core/v8_object.h"
+#include "v8-template.h"
+
 
 namespace bind {
 
-class Canvas : public nica::Wrappable<Canvas>{
+class Canvas : public nica::V8Object<Canvas>{
   public:
-    static nica::WrapperInfo kWrapperInfo;
-    static const bool is_dynamic_obj = true;
-
-    Canvas(int width, int height);
+    Canvas(v8::Isolate* isolate, v8::Local<v8::Object> instance,
+      int width, int height);
     ~Canvas();
     Canvas(const Canvas&) = delete;
     Canvas& operator=(const Canvas&) = delete;
-  
-    static void Register(
-      nica::JSIsolate* js_isolate, nica::JSContext* js_context);
 
-  private:
+    static nica::WrapperInfo kWrapperInfo;
+    static const char* ClassName() { return "Canvas"; }
     static nica::FunctionTemplateBuilder GetFunctionTemplateBuilder(
       v8::Isolate* isolate);
-
-    const char* GetTypeName() final { return "Canvas"; }
+  
+  private:
 
     void SetWidth(int width) { width_ = width; }
     void SetHeight(int height) { height_ = height; } 
     int width() { return width_; }
     int height() { return height_; }
+    WebGLRenderingContext* GetContext();
 
     int width_;
     int height_;
+
+    std::unique_ptr<WebGLRenderingContext> webgl_rendering_context_;
 };
 
 } // namespace bind

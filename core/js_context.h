@@ -23,7 +23,7 @@ class JSContext {
         void SetContext(v8::Local<v8::Context> context);
 
     private:
-        v8::Isolate* isolate_;
+        v8::Isolate* isolate_ = nullptr;
         v8::UniquePersistent<v8::Context> context_;
 };
 } // namespace nica

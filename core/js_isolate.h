@@ -21,7 +21,7 @@ class JSIsolate {
     v8::Isolate* isolate() { return isolate_; }
 
   private:
-    v8::Isolate* isolate_;
+    v8::Isolate* isolate_ = nullptr;
     std::unique_ptr<PerIsolateData> isolate_data_;
 };
 

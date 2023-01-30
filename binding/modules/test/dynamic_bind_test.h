@@ -3,6 +3,7 @@
 
 #include "core/arguments.h"
 #include "core/wrappable.h"
+#include "core/v8_object.h"
 
 namespace nica {
 class JSIsolate;
@@ -11,25 +12,20 @@ class FunctionTemplateBuilder;
 }
 
 namespace bind {
-class DynamicBindTest : public nica::Wrappable<DynamicBindTest> {
+class DynamicBindTest : public nica::V8Object<DynamicBindTest> {
  public:
  
     static nica::WrapperInfo kWrapperInfo;
-    static const bool is_dynamic_obj = true;
-    DynamicBindTest();
+    static const char* ClassName() { return "DynamicBindTest"; }
+    static nica::FunctionTemplateBuilder GetFunctionTemplateBuilder(
+        v8::Isolate* isolate);
+
+    DynamicBindTest(v8::Isolate* isolate, v8::Local<v8::Object> instance);
     ~DynamicBindTest() override;
     DynamicBindTest(const DynamicBindTest&) = delete;
     DynamicBindTest& operator=(const DynamicBindTest&) = delete;
 
-    static void Register(
-        nica::JSIsolate* js_isolate, nica::JSContext* js_contrxt);
   private:
-
-    static nica::FunctionTemplateBuilder GetFunctionTemplateBuilder(
-        v8::Isolate* isolate);
-    
-    const char* GetTypeName() final { return "DynamicBindTest"; }
-    
     void TestBind();
     int TestBindWithReturn();
     int TestBindWithParams(int a, int b);

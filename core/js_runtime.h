@@ -20,10 +20,12 @@ class JSRuntime {
       JSRuntime(const JSRuntime&) = delete;
       JSRuntime& operator=(const JSRuntime&) = delete;
 
-      void EvaluateJavascriptSource(const std::string& source);
-      void EvaluateJavascriptFile(const base::FilePath& js_file_path);
       JSContext* GetJSContext();
       JSIsolate* GetJSIsolate();
+      void InstallBuiltinModule();
+
+      void EvaluateJavascriptSource(const std::string& source);
+      void EvaluateJavascriptFile(const base::FilePath& js_file_path);
 
       class Scope {
          public:
@@ -42,7 +44,6 @@ class JSRuntime {
       friend class Scope;
 
       void CreateJSContext();
-      void InstallBuiltinModule();
 
       std::unique_ptr<JSIsolate> js_isolate_;
       std::unique_ptr<JSContext> js_context_;

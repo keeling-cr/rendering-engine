@@ -20,9 +20,7 @@ void DynamicBindTestNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
         isolate->ThrowError("Canvas must be constructed with new");
         return;
     }
-    DynamicBindTest* test = new DynamicBindTest();
-    
-    args.Holder()->SetInternalField(0, v8::External::New(isolate, test));
+    DynamicBindTest* test = new DynamicBindTest(isolate, args.Holder());
 
     // // return the new object back to the javascript caller
     args.GetReturnValue().Set(args.Holder()); 
@@ -33,7 +31,9 @@ void DynamicBindTestNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
 nica::WrapperInfo DynamicBindTest::kWrapperInfo = {
     nica::kEmbedderNicaMain};
 
-DynamicBindTest::DynamicBindTest() = default;
+DynamicBindTest::DynamicBindTest(
+    v8::Isolate* isolate, v8::Local<v8::Object> instance)
+    : V8Object(isolate, instance) {}
 
 DynamicBindTest::~DynamicBindTest() = default;
 
@@ -68,21 +68,6 @@ DynamicBindTest::GetFunctionTemplateBuilder(
             .SetMethod("testwithreturn", std::function<int(DynamicBindTest*)>{&DynamicBindTest::TestBindWithReturn})
             .SetMethod("testwithparam", std::function<int(DynamicBindTest*, int, int)>{&DynamicBindTest::TestBindWithParams})
             .SetProperty("width", std::function<int(DynamicBindTest*)>{&DynamicBindTest::GetWidth}, std::function<void(DynamicBindTest*, int)>{&DynamicBindTest::SetWidth});
-}
-
-void DynamicBindTest::Register(
-        nica::JSIsolate* js_isolate, nica::JSContext* js_context) {
-    v8::Isolate* isolate = js_isolate->isolate();
-    v8::HandleScope handle_scope(isolate);
-    v8::Local<v8::Context> context = js_context->context();
-    v8::Context::Scope context_scope(context);
-
-    v8::Local<v8::Object> global = context->Global();
-    global
-        ->Set(context, nica::StringToV8(isolate, "dyBindTest"),
-            GetFunctionTemplateBuilder(isolate).
-            Build()->GetFunction(context).ToLocalChecked())
-            .ToChecked();    
 }
 
 } // namespace bind

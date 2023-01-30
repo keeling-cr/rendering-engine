@@ -12,6 +12,7 @@
 #include "binding/modules/webgl/canvas.h"
 #include "binding/modules/test/bind_test.h"
 #include "binding/modules/test/dynamic_bind_test.h"
+#include "binding/modules/webgl/webgl_rendering_context.h"
 
 namespace nica {
 
@@ -19,6 +20,7 @@ JSRuntime::Scope::Scope(JSRuntime* runtime)
     : isolate_scope_(runtime->GetJSIsolate()->isolate()),
       handle_scope_(runtime->GetJSIsolate()->isolate()),
       scope_(runtime->GetJSContext()->context()) {
+    runtime->InstallBuiltinModule();
 }
 
 JSRuntime::Scope::~Scope() = default;
@@ -29,7 +31,6 @@ JSRuntime::JSRuntime() {
     v8::V8::Initialize();
     js_isolate_  = JSIsolate::Create();
     CreateJSContext();
-    InstallBuiltinModule();
 }
 
 JSRuntime::~JSRuntime() {
@@ -60,6 +61,7 @@ void JSRuntime::InstallBuiltinModule() {
     bind::Canvas::Register(js_isolate_.get(), js_context_.get());
     bind::BindTest::Register(js_isolate_.get(), js_context_.get());
     bind::DynamicBindTest::Register(js_isolate_.get(), js_context_.get());
+    bind::WebGLRenderingContext::Register(js_isolate_.get(), js_context_.get());
 }
     
 void JSRuntime::EvaluateJavascriptSource(const std::string& source) {

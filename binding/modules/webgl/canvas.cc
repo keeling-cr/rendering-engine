@@ -19,9 +19,8 @@ void CanvasNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
         isolate->ThrowError("Invalid arguments");
         return; 
     }
-    Canvas * c = new Canvas(x, y);
-
-    args.Holder()->SetInternalField(0, v8::External::New(isolate, c));
+    // todo(liqining): memory leak
+    Canvas * c = new Canvas(isolate, args.Holder(), x, y);
 
     // // return the new object back to the javascript caller
     args.GetReturnValue().Set(args.Holder());
@@ -32,32 +31,32 @@ void CanvasNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
 nica::WrapperInfo Canvas::kWrapperInfo = {
     nica::kEmbedderNicaMain};
 
-Canvas::Canvas(int width, int height): width_(width), height_(height) {}
+Canvas::Canvas(
+    v8::Isolate* isolate, v8::Local<v8::Object> instance,
+    int width, int height)
+    : V8Object(isolate, instance)
+    , width_(width)
+    , height_(height) {}
 
 Canvas::~Canvas() = default;
 
+
+WebGLRenderingContext* Canvas::GetContext() {
+    if (!webgl_rendering_context_) {
+        webgl_rendering_context_ = 
+            std::unique_ptr<WebGLRenderingContext>(new WebGLRenderingContext(GetIsolate()));
+    }
+    LOG(ERROR) << "keilingnica " << __func__;
+    return webgl_rendering_context_.get();
+}
 
 nica::FunctionTemplateBuilder 
 Canvas::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     return nica::FunctionTemplateBuilder(isolate, CanvasNew)
+            .SetMethod("getContext", std::function<WebGLRenderingContext*(Canvas*)>{&Canvas::GetContext})
             .SetProperty("width", std::function<int(Canvas*)>{&Canvas::width}, std::function<void(Canvas*, int)>{&Canvas::SetWidth})
             .SetProperty("height", std::function<int(Canvas*)>{&Canvas::height}, std::function<void(Canvas*, int)>{&Canvas::SetHeight});
-}
-
-void Canvas::Register(
-        nica::JSIsolate* js_isolate, nica::JSContext* js_context) {
-    v8::Isolate* isolate = js_isolate->isolate();
-    v8::HandleScope handle_scope(isolate);
-    v8::Local<v8::Context> context = js_context->context();
-    v8::Context::Scope context_scope(context);
-
-    v8::Local<v8::Object> global = context->Global();
-    global
-        ->Set(context, nica::StringToV8(isolate, "canvas"),
-            GetFunctionTemplateBuilder(isolate).
-            Build()->GetFunction(context).ToLocalChecked())
-            .ToChecked();    
 }
 
 } // namespace bind

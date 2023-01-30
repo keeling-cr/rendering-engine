@@ -11,6 +11,7 @@ set(CORE_SOURCE
     per_isolate_data.cc
     interceptor.cc
     wrappable.cc
-    function_template_builder.cc)
+    function_template_builder.cc
+    v8_object.cc)
 
 add_library(libcore ${CORE_SOURCE})

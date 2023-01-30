@@ -15,26 +15,14 @@ class Arguments {
   explicit Arguments(const v8::PropertyCallbackInfo<v8::Value>& info);
   ~Arguments();
 
-  bool GetHolder(int* out) const {
-    return false;
-  }
-
   template <typename T>
   bool GetHolder(T* out) const {
     v8::Local<v8::Object> holder = is_for_property_
                                        ? info_for_property_->Holder()
                                        : info_for_function_->Holder();
-    if (std::is_pointer<T>::value && 
-      std::remove_pointer<T>::type::is_dynamic_obj) {
-      v8::Local<v8::Value> f = holder->GetInternalField(0);
-      v8::Local<v8::External> wrap =
-        v8::Local<v8::External>::Cast(holder->GetInternalField(0));
-      void* ptr = wrap->Value();
-      out = static_cast<T*>(ptr);
-      return true;
-    } else {
-      return ConvertFromV8(isolate_, holder, out);
-    }
+    if (holder.IsEmpty())
+      LOG(ERROR) << "holder empty";
+    return ConvertFromV8(isolate_, holder, out);
   }
 
   template<typename T>

@@ -6,6 +6,7 @@
 #include "base/notreached.h"
 #include "core/embedders.h"
 #include "v8-isolate.h"
+#include "base/logging.h"
 
 using v8::ArrayBuffer;
 using v8::Eternal;

@@ -13,7 +13,6 @@ namespace bind {
 class BindTest : public nica::Wrappable<BindTest> {
  public:
   static nica::WrapperInfo kWrapperInfo;
-  static const bool is_dynamic_obj = false;
 
   BindTest();
   ~BindTest() override;
