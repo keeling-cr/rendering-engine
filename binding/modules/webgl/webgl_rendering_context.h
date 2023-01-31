@@ -15,7 +15,8 @@ namespace bind {
 
 class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
   public:
-    WebGLRenderingContext(v8::Isolate* isolate, v8::Local<v8::Object> instance);
+    static unsigned long s_context_counter;
+    
     WebGLRenderingContext(v8::Isolate* isolate);
     ~WebGLRenderingContext();
 
@@ -23,10 +24,14 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     static const char* ClassName() { return "WebGLRenderingContext"; }
     static nica::FunctionTemplateBuilder GetFunctionTemplateBuilder(
       v8::Isolate* isolate);
+    
+    unsigned long context_id() { return context_id_; }
   private:
-      void test() { 
-        LOG(ERROR) << "keilingnica webglrendering context" << __func__;
-      }
+    unsigned long context_id_;
+    
+    void test() { 
+      LOG(ERROR) << "keilingnica webglrendering context" << __func__;
+    }
 };
 
 } // namespace bind
