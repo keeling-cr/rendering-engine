@@ -1,3 +1,6 @@
 out
 doc
-third_party
+third_party/v8
+third_party/angle
+third_party/napi
+third_party/test

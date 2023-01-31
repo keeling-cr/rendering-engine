@@ -17,9 +17,10 @@
 5. persistent 对象提供垃圾回收机制
 6. 统一 v8object 和 wrapper 对象
 7. functiontemplate builder constructur parent class provide base static constructor
+8. v8 头文件引用规范
 
 
 ## DEMO 形态
 
 1. 支持 texture/renderbuffer/framebuffer/shader
-2. 简单画一个圆形
+2. 简单画一个三角形
