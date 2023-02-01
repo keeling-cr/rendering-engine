@@ -18,7 +18,7 @@
 6. 统一 v8object 和 wrapper 对象
 7. functiontemplate builder constructur parent class provide base static constructor
 8. v8 头文件引用规范
-
+9. 支持 messagepump
 
 ## DEMO 形态
 

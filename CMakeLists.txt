@@ -6,11 +6,17 @@ set(nica ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DV8_COMPRESS_POINTERS)
 add_definitions(-DV8_ENABLE_SANDBOX)
 
+find_library(OPENGL_LIBRARY OpenGL)
+find_library(GLFW_LIBRARY glfw)
+find_library(GLEW_LIBRARY GLEW)
+
 include_directories(
     ${nica}
     ${nica}/base
     ${nica}/third_party/v8/include
     ${nica}/third_party/test
+    ${nica}/third_party/glad
+    ${nica}/third_party/glfw/include
 )
 
 add_subdirectory(base)
@@ -30,6 +36,9 @@ add_executable(${PROJECT_NAME} ${nica}/test.cc)
 
 target_link_libraries(${PROJECT_NAME} 
     ${V8_LIBS}
+    ${OPENGL_LIBRARY}
+    ${GLEW_LIBRARY}
+    ${GLFW_LIBRARY}
     libbase
     libcore
     libv8bind)

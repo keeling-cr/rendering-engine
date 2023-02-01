@@ -2,11 +2,10 @@
 console.log("keilingnica hello world log");
 var a = new Canvas(3, 1);
 // console.log(a.width, " ", a.height);
-var b = a.getContext()
-b.test()
+// var b = a.getContext()
 
 var c = a.getContext()
-c.test()
+c.clearColor(0.0, 1.0, 1.0, 1.0);
 
 // bindTest.test()
 // console.log(bindTest.testwithreturn())

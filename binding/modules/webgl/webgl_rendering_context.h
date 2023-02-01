@@ -11,6 +11,9 @@
 #include "v8-template.h"
 #include "core/v8_object.h"
 
+#include <glad/glad.h> 
+#include <GLFW/glfw3.h>
+
 namespace bind {
 
 class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
@@ -26,12 +29,13 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
       v8::Isolate* isolate);
     
     unsigned long context_id() { return context_id_; }
+
+    void ClearColor(float read, float green, float blue, float alpha);
   private:
+    bool InitGlfw();
+
+    GLFWwindow* window_ = nullptr;    
     unsigned long context_id_;
-    
-    void test() { 
-      LOG(ERROR) << "keilingnica webglrendering context" << __func__;
-    }
 };
 
 } // namespace bind

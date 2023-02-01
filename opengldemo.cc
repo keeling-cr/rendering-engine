@@ -37,18 +37,19 @@ int main(int argc, char * argv[]) {
         return -1;
     }
 
+    // 渲染指令
+    glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glfwSwapBuffers(window); // 交换颜色缓冲
+    
     // 渲染循环
     while(!glfwWindowShouldClose(window)) {
         // 输入
         processInput(window);
 
-        // 渲染指令
-        glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
         // 检查并调用事件，交换缓冲
         glfwPollEvents(); // 检查触发事件
-        glfwSwapBuffers(window); // 交换颜色缓冲
+        // glfwSwapBuffers(window); // 交换颜色缓冲
     }
 
     // 释放/删除之前的分配的所有资源
