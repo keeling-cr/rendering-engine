@@ -1,4 +1,5 @@
 #include "binding/modules/webgl/webgl_rendering_context.h"
+#include "binding/modules/webgl/webgl_buffer.h"
 #include "base/logging.h"
 
 namespace bind {
@@ -69,11 +70,29 @@ void WebGLRenderingContext::ClearColor(
     }
 }
 
+WebGLBuffer* WebGLRenderingContext::CreateBuffer() {
+  GLuint buffer_id = 0;
+  glGenBuffers(1, &buffer_id);
+  WebGLBuffer* buffer = new WebGLBuffer(GetIsolate(), this, buffer_id);
+  return buffer;
+}
+
+void WebGLRenderingContext::BindBuffer(WebGLBuffer* buffer) {
+    LOG(ERROR) << "buffer id" << buffer->webgl_id();
+}
+
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
-    return nica::FunctionTemplateBuilder(isolate, nullptr)
-        .SetMethod("clearColor", std::function<void(WebGLRenderingContext*, float, float, float, float)>{&WebGLRenderingContext::ClearColor});
+    nica::FunctionTemplateBuilder builder(isolate, nullptr);
+    builder.SetMethod("createBuffer", std::function<WebGLBuffer*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateBuffer});    
+    builder.SetMethod("bindBuffer", std::function<void(WebGLRenderingContext*, WebGLBuffer*)>{&WebGLRenderingContext::BindBuffer});
+    builder.SetMethod("clearColor", std::function<void(WebGLRenderingContext*, float, float, float, float)>{&WebGLRenderingContext::ClearColor});
+
+#define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
+#include "binding/modules/webgl/webgl_context_const_value.h"    
+#undef WEBGL_CONSTANT
+    return builder;
 }
 
 } // namespace bind

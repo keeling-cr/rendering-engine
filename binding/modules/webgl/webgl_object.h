@@ -17,11 +17,11 @@ template<class V, typename T>
 class WebGLObject : public nica::V8Object<V>, public WebGLObjectInterface {
  public:
   WebGLObject(v8::Isolate* isolate, WebGLRenderingContext* context, T webgl_id)
-      : V8Object<V>(isolate)
+      : nica::V8Object<V>(isolate)
       , context_id_(context->context_id())
       , webgl_id_(webgl_id) {}
 
-  bool ValidateContext(WebGLRenderingContext* context) { return context->get_context_id() == context_id_; }
+  bool ValidateContext(WebGLRenderingContext* context) { return context->context_id() == context_id_; }
   T webgl_id() { return webgl_id_; }
 
  private:

@@ -52,7 +52,12 @@ class FunctionTemplateBuilder {
                                   const T& getter, const U& setter) {
       return SetPropertyImpl(name, internal::CreateFunctionTemplateForFunction(isolate_, getter, type_name_),
         internal::CreateFunctionTemplateForFunction(isolate_, setter, type_name_));
-   }
+    }
+
+    template<typename T>
+    FunctionTemplateBuilder& SetValue(const base::StringPiece& name, T val) {
+      return SetImpl(name, ConvertToV8(isolate_, val));
+    }
   
   private:
     FunctionTemplateBuilder& SetImpl(const base::StringPiece& name,

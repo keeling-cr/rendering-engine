@@ -16,6 +16,8 @@
 
 namespace bind {
 
+class WebGLBuffer;
+
 class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
   public:
     static unsigned long s_context_counter;
@@ -31,6 +33,8 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     unsigned long context_id() { return context_id_; }
 
     void ClearColor(float read, float green, float blue, float alpha);
+    WebGLBuffer* CreateBuffer();
+    void BindBuffer(WebGLBuffer* buffer);
   private:
     bool InitGlfw();
 

@@ -13,6 +13,7 @@
 #include "binding/modules/test/bind_test.h"
 #include "binding/modules/test/dynamic_bind_test.h"
 #include "binding/modules/webgl/webgl_rendering_context.h"
+#include "binding/modules/webgl/webgl_buffer.h"
 
 namespace nica {
 
@@ -62,6 +63,7 @@ void JSRuntime::InstallBuiltinModule() {
     bind::BindTest::Register(js_isolate_.get(), js_context_.get());
     bind::DynamicBindTest::Register(js_isolate_.get(), js_context_.get());
     bind::WebGLRenderingContext::Register(js_isolate_.get(), js_context_.get());
+    bind::WebGLBuffer::Register(js_isolate_.get(), js_context_.get());
 }
     
 void JSRuntime::EvaluateJavascriptSource(const std::string& source) {

@@ -5,6 +5,9 @@ var a = new Canvas(3, 1);
 // var b = a.getContext()
 
 var c = a.getContext()
+console.log("c arrary buffer value", c.ARRAY_BUFFER)
+var buffer = c.createBuffer()
+c.bindBuffer(buffer)
 c.clearColor(0.0, 1.0, 1.0, 1.0);
 
 // bindTest.test()
