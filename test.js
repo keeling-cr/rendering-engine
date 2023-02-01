@@ -4,11 +4,10 @@ var a = new Canvas(3, 1);
 // console.log(a.width, " ", a.height);
 // var b = a.getContext()
 
-var c = a.getContext()
-console.log("c arrary buffer value", c.ARRAY_BUFFER)
-var buffer = c.createBuffer()
-c.bindBuffer(buffer)
-c.clearColor(0.0, 1.0, 1.0, 1.0);
+var gl = a.getContext()
+var buffer = gl.createBuffer()
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+gl.clearColor(0.0, 1.0, 1.0, 1.0);
 
 // bindTest.test()
 // console.log(bindTest.testwithreturn())

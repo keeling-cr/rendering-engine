@@ -17,6 +17,7 @@
 namespace bind {
 
 class WebGLBuffer;
+class WebGLObjectInterface;
 
 class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
   public:
@@ -34,12 +35,18 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
 
     void ClearColor(float read, float green, float blue, float alpha);
     WebGLBuffer* CreateBuffer();
-    void BindBuffer(WebGLBuffer* buffer);
+    void BindBuffer(GLenum target, WebGLBuffer* buffer);
   private:
     bool InitGlfw();
+    bool ValidateObject(WebGLObjectInterface* object);
+
+    void set_gl_error(GLenum error);
+    GLenum gl_error();
 
     GLFWwindow* window_ = nullptr;    
     unsigned long context_id_;
+    GLenum gl_error_;
+    std::map<GLuint, WebGLBuffer*> buffer_map_;
 };
 
 } // namespace bind
