@@ -46,6 +46,8 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void LinkProgram(WebGLProgram* program);
     void UseProgram(WebGLProgram* program);
     void AttachShader(WebGLProgram* program, WebGLShader* shader);
+
+    GLint GetAttribLocation(WebGLProgram* program, const std::string& name);
   private:
     bool InitGlfw();
     bool ValidateObject(WebGLObjectInterface* object);

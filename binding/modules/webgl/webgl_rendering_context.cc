@@ -183,7 +183,21 @@ void WebGLRenderingContext::UseProgram(WebGLProgram* program) {
     glUseProgram(program_id);
 }
 
+GLint WebGLRenderingContext::GetAttribLocation(
+    WebGLProgram* program, const std::string& name) {
+    LOG(ERROR) << "keilingnica " << __func__;
+    if (!RequireObject(program)) 
+        return -1;
+    if (!ValidateObject(program))
+        return -1;
+
+    GLuint program_id = program->webgl_id();
+    GLint location = glGetAttribLocation(program_id, name.c_str());
+    return location;
+}
+
 void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
+    LOG(ERROR) << "keilingnica " << __func__;
     switch (target) {
         case GL_ARRAY_BUFFER:
         case GL_ELEMENT_ARRAY_BUFFER:
@@ -232,6 +246,7 @@ nica::FunctionTemplateBuilder
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     nica::FunctionTemplateBuilder builder(isolate, nullptr);
+    builder.SetMethod("getAttribLocation", std::function<GLint(WebGLRenderingContext*, WebGLProgram*, const std::string&)>{&WebGLRenderingContext::GetAttribLocation});
     builder.SetMethod("attachShader", std::function<void(WebGLRenderingContext*, WebGLProgram*, WebGLShader*)>{&WebGLRenderingContext::AttachShader});
     builder.SetMethod("useProgram", std::function<void(WebGLRenderingContext*, WebGLProgram*)>{&WebGLRenderingContext::UseProgram});
     builder.SetMethod("createProgram", std::function<void(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateProgram});
