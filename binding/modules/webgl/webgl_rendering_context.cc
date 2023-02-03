@@ -100,6 +100,43 @@ void WebGLRenderingContext::ShaderSource(WebGLShader* shader, const std::string&
     shader->set_source(source);
 }
 
+void WebGLRenderingContext::CompileShader(WebGLShader* shader) {
+    LOG(ERROR) << "keilingnica webgl " << __func__;
+    if (!RequireObject(shader)) 
+        return;
+    if (!ValidateObject(shader)) 
+        return;
+    
+    GLuint shader_id = shader->webgl_id();
+    GLint shader_type = 0;
+    glGetShaderiv(shader_id, GL_SHADER_TYPE, &shader_type);
+    if (shader_type == 0)
+        return;
+    
+    const char* shader_code = shader->source();
+
+    glShaderSource(shader_id, 1, &shader_code, NULL);
+    glCompileShader(shader_id);
+
+    GLint compile_status;
+    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_status);
+
+    if (!compile_status) { // If compilation was not successful
+        int length;
+        glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length);
+        char* message = new char[length];
+ 
+        // Get additional information
+        glGetShaderInfoLog(shader_id, length, &length, message);
+        LOG(ERROR) << "Cannot Compile Shader: " << message;
+        shader->set_is_valid(false);
+        shader->set_log(message);
+
+        delete[] message;
+        glDeleteShader(shader_id);
+    }
+}
+
 void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
     
     switch (target) {

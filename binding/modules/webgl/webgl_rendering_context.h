@@ -39,6 +39,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void BindBuffer(GLenum target, WebGLBuffer* buffer);
     WebGLShader* CreateShader(GLenum type);
     void ShaderSource(WebGLShader* shader, const std::string& source);
+    void CompileShader(WebGLShader* shader);
   private:
     bool InitGlfw();
     bool ValidateObject(WebGLObjectInterface* object);

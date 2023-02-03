@@ -21,7 +21,7 @@ class WebGLShader : public WebGLObject<WebGLShader, GLuint> {
   static nica::FunctionTemplateBuilder GetFunctionTemplateBuilder(
       v8::Isolate* isolate);
 
-  std::string source() { return source_; }
+  const char* source() { return source_.c_str(); }
   void set_source(const std::string& source) { source_ = source; }
 
   std::string log() { return log_; }
