@@ -4,10 +4,22 @@ var a = new Canvas(3, 1);
 // console.log(a.width, " ", a.height);
 // var b = a.getContext()
 
-var gl = a.getContext()
-var buffer = gl.createBuffer()
-gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-gl.clearColor(0.0, 1.0, 1.0, 1.0);
+var vertices = [
+    -0.5,0.5,0.0,
+    -0.5,-0.5,0.0,
+    0.5,-0.5,0.0, 
+];
+
+var farray = new Float32Array(vertices)
+console.log(farray)
+
+var gl = a.getContext()         
+
+var vertex_buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+
+// Create a vertex shader object
+var vertShader = gl.createShader(gl.VERTEX_SHADER);
 
 // bindTest.test()
 // console.log(bindTest.testwithreturn())

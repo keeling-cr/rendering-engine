@@ -5,6 +5,7 @@ set(BIND_SOURCE
     modules/test/bind_test.cc
     modules/test/dynamic_bind_test.cc
     modules/webgl/webgl_buffer.cc
-    modules/webgl/webgl_rendering_context.cc)
+    modules/webgl/webgl_rendering_context.cc
+    modules/webgl/webgl_shader.cc)
 
 add_library(libv8bind ${BIND_SOURCE})

@@ -17,6 +17,7 @@
 namespace bind {
 
 class WebGLBuffer;
+class WebGLShader;
 class WebGLObjectInterface;
 
 class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
@@ -36,9 +37,17 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void ClearColor(float read, float green, float blue, float alpha);
     WebGLBuffer* CreateBuffer();
     void BindBuffer(GLenum target, WebGLBuffer* buffer);
+    WebGLShader* CreateShader(GLenum type);
   private:
     bool InitGlfw();
     bool ValidateObject(WebGLObjectInterface* object);
+
+    template<class T>
+    void DeleteMapObjects(std::map<GLuint, T*>& map) {
+      typename std::map<GLuint, T*>::iterator it;
+      for (it = map.begin(); it != map.end(); it++)
+        delete it->second;
+    }
 
     void set_gl_error(GLenum error);
     GLenum gl_error();
@@ -46,7 +55,9 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     GLFWwindow* window_ = nullptr;    
     unsigned long context_id_;
     GLenum gl_error_;
+    // todo(liqining): memory release
     std::map<GLuint, WebGLBuffer*> buffer_map_;
+    std::map<GLuint, WebGLShader*> shader_map_;
 };
 
 } // namespace bind

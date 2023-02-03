@@ -1,6 +1,7 @@
 #include "binding/modules/webgl/webgl_rendering_context.h"
 #include "binding/modules/webgl/webgl_buffer.h"
 #include "binding/modules/webgl/webgl_object.h"
+#include "binding/modules/webgl/webgl_shader.h"
 #include "base/logging.h"
 
 namespace bind {
@@ -33,7 +34,10 @@ WebGLRenderingContext:: WebGLRenderingContext(v8::Isolate* isolate)
     InitGlfw();
 }
 
-WebGLRenderingContext::~WebGLRenderingContext() = default;
+WebGLRenderingContext::~WebGLRenderingContext() {
+    DeleteMapObjects(buffer_map_);
+    DeleteMapObjects(shader_map_);
+}
 
 
 bool WebGLRenderingContext::InitGlfw() {
@@ -79,6 +83,15 @@ WebGLBuffer* WebGLRenderingContext::CreateBuffer() {
     return buffer;
 }
 
+WebGLShader* WebGLRenderingContext::CreateShader(GLenum type) {
+    LOG(ERROR) << "keilingnica webgl " << __func__;
+    bool ok = true;
+    GLuint shader_id = glCreateShader(type);
+    WebGLShader* shader = new WebGLShader(GetIsolate(), this, shader_id);
+    shader_map_[shader_id] = shader;
+    return shader; 
+}
+
 void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
     
     switch (target) {
@@ -121,6 +134,7 @@ nica::FunctionTemplateBuilder
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     nica::FunctionTemplateBuilder builder(isolate, nullptr);
+    builder.SetMethod("createShader", std::function<WebGLShader*(WebGLRenderingContext*, GLenum)>{&WebGLRenderingContext::CreateShader});
     builder.SetMethod("createBuffer", std::function<WebGLBuffer*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateBuffer});    
     builder.SetMethod("bindBuffer", std::function<void(WebGLRenderingContext*, GLenum, WebGLBuffer*)>{&WebGLRenderingContext::BindBuffer});
     builder.SetMethod("clearColor", std::function<void(WebGLRenderingContext*, float, float, float, float)>{&WebGLRenderingContext::ClearColor});

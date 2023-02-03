@@ -12,6 +12,4 @@ int main(int argc, char *argv[]) {
         LOG(ERROR) << "keilingnica " << argv[1];
         runtime.EvaluateJavascriptFile(base::FilePath(argv[1]));
     }
-
-    while (true) {}
 }
