@@ -38,9 +38,11 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     WebGLBuffer* CreateBuffer();
     void BindBuffer(GLenum target, WebGLBuffer* buffer);
     WebGLShader* CreateShader(GLenum type);
+    void ShaderSource(WebGLShader* shader, const std::string& source);
   private:
     bool InitGlfw();
     bool ValidateObject(WebGLObjectInterface* object);
+    bool RequireObject(const void* object);
 
     template<class T>
     void DeleteMapObjects(std::map<GLuint, T*>& map) {

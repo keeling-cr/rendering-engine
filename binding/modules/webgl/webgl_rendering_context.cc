@@ -85,11 +85,19 @@ WebGLBuffer* WebGLRenderingContext::CreateBuffer() {
 
 WebGLShader* WebGLRenderingContext::CreateShader(GLenum type) {
     LOG(ERROR) << "keilingnica webgl " << __func__;
-    bool ok = true;
     GLuint shader_id = glCreateShader(type);
     WebGLShader* shader = new WebGLShader(GetIsolate(), this, shader_id);
     shader_map_[shader_id] = shader;
     return shader; 
+}
+
+void WebGLRenderingContext::ShaderSource(WebGLShader* shader, const std::string& source) {
+    LOG(ERROR) << "keilingnica webgl " << __func__;
+    if (!RequireObject(shader)) 
+        return;
+    if (!ValidateObject(shader))
+        return;
+    shader->set_source(source);
 }
 
 void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
@@ -109,11 +117,19 @@ void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
 }
 
 bool WebGLRenderingContext::ValidateObject(WebGLObjectInterface* object) {
-  if (object && !object->ValidateContext(this)) {
-    set_gl_error(GL_INVALID_OPERATION);
-    return false;
-  }
-  return true;
+    if (object && !object->ValidateContext(this)) {
+        set_gl_error(GL_INVALID_OPERATION);
+        return false;
+    }
+    return true;
+}
+
+bool WebGLRenderingContext::RequireObject(const void* object) {
+    if (!object) {
+        set_gl_error(GL_INVALID_VALUE);
+        return false;
+    }
+    return true;
 }
 
 void WebGLRenderingContext::set_gl_error(GLenum error) {
@@ -134,6 +150,7 @@ nica::FunctionTemplateBuilder
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     nica::FunctionTemplateBuilder builder(isolate, nullptr);
+    builder.SetMethod("shaderSource", std::function<void(WebGLRenderingContext*, WebGLShader*, const std::string&)>{&WebGLRenderingContext::ShaderSource});
     builder.SetMethod("createShader", std::function<WebGLShader*(WebGLRenderingContext*, GLenum)>{&WebGLRenderingContext::CreateShader});
     builder.SetMethod("createBuffer", std::function<WebGLBuffer*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateBuffer});    
     builder.SetMethod("bindBuffer", std::function<void(WebGLRenderingContext*, GLenum, WebGLBuffer*)>{&WebGLRenderingContext::BindBuffer});
