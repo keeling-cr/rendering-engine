@@ -2,6 +2,7 @@
 #include "binding/modules/webgl/webgl_buffer.h"
 #include "binding/modules/webgl/webgl_object.h"
 #include "binding/modules/webgl/webgl_shader.h"
+#include "binding/modules/webgl/webgl_program.h"
 #include "base/logging.h"
 
 namespace bind {
@@ -37,6 +38,7 @@ WebGLRenderingContext:: WebGLRenderingContext(v8::Isolate* isolate)
 WebGLRenderingContext::~WebGLRenderingContext() {
     DeleteMapObjects(buffer_map_);
     DeleteMapObjects(shader_map_);
+    DeleteMapObjects(program_map_);
 }
 
 
@@ -137,8 +139,51 @@ void WebGLRenderingContext::CompileShader(WebGLShader* shader) {
     }
 }
 
-void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
+WebGLProgram* WebGLRenderingContext::CreateProgram() {
+    GLuint program_id = glCreateProgram();
+    WebGLProgram* program = new WebGLProgram(GetIsolate(), this, program_id);
+    program_map_[program_id] = program;
+    return program;
+}
+
+void WebGLRenderingContext::AttachShader(
+    WebGLProgram* program, WebGLShader* shader) {
+    if (!RequireObject(program)) 
+        return;
+    if (!ValidateObject(program)) 
+        return;
+
+    GLuint program_id = program->webgl_id();
+    if (!RequireObject(shader)) 
+        return;
+    if (!ValidateObject(shader))
+        return;
     
+    GLuint shader_id = shader->webgl_id();
+    glAttachShader(program_id, shader_id);
+}
+
+void WebGLRenderingContext::LinkProgram(WebGLProgram* program) {
+  if (!RequireObject(program)) 
+    return;
+  if (!ValidateObject(program)) 
+    return;
+
+  GLuint program_id = program->webgl_id();
+  glLinkProgram(program_id);
+}
+
+void WebGLRenderingContext::UseProgram(WebGLProgram* program) {
+    if (!RequireObject(program))
+        return;
+    if (!ValidateObject(program)) 
+        return;
+
+    GLuint program_id = program->webgl_id();
+    glUseProgram(program_id);
+}
+
+void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
     switch (target) {
         case GL_ARRAY_BUFFER:
         case GL_ELEMENT_ARRAY_BUFFER:
@@ -187,6 +232,10 @@ nica::FunctionTemplateBuilder
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     nica::FunctionTemplateBuilder builder(isolate, nullptr);
+    builder.SetMethod("attachShader", std::function<void(WebGLRenderingContext*, WebGLProgram*, WebGLShader*)>{&WebGLRenderingContext::AttachShader});
+    builder.SetMethod("useProgram", std::function<void(WebGLRenderingContext*, WebGLProgram*)>{&WebGLRenderingContext::UseProgram});
+    builder.SetMethod("createProgram", std::function<void(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateProgram});
+    builder.SetMethod("linkProgram", std::function<void(WebGLRenderingContext*, WebGLProgram*)>{&WebGLRenderingContext::LinkProgram});
     builder.SetMethod("shaderSource", std::function<void(WebGLRenderingContext*, WebGLShader*, const std::string&)>{&WebGLRenderingContext::ShaderSource});
     builder.SetMethod("createShader", std::function<WebGLShader*(WebGLRenderingContext*, GLenum)>{&WebGLRenderingContext::CreateShader});
     builder.SetMethod("createBuffer", std::function<WebGLBuffer*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateBuffer});    

@@ -15,6 +15,7 @@
 #include "binding/modules/webgl/webgl_rendering_context.h"
 #include "binding/modules/webgl/webgl_buffer.h"
 #include "binding/modules/webgl/webgl_shader.h"
+#include "binding/modules/webgl/webgl_program.h"
 
 namespace nica {
 
@@ -59,13 +60,16 @@ void JSRuntime::CreateJSContext() {
 }
 
 void JSRuntime::InstallBuiltinModule() {
-    bind::Console::Register(js_isolate_.get(), js_context_.get());
-    bind::Canvas::Register(js_isolate_.get(), js_context_.get());
-    bind::BindTest::Register(js_isolate_.get(), js_context_.get());
-    bind::DynamicBindTest::Register(js_isolate_.get(), js_context_.get());
-    bind::WebGLRenderingContext::Register(js_isolate_.get(), js_context_.get());
-    bind::WebGLBuffer::Register(js_isolate_.get(), js_context_.get());
-    bind::WebGLShader::Register(js_isolate_.get(), js_context_.get());
+#define REGISTER(module) bind::module::Register(js_isolate_.get(),js_context_.get())
+    REGISTER(Console);
+    REGISTER(Canvas);
+    REGISTER(BindTest);
+    REGISTER(DynamicBindTest);
+    REGISTER(WebGLRenderingContext);
+    REGISTER(WebGLBuffer);
+    REGISTER(WebGLShader);
+    REGISTER(WebGLProgram);
+#undef REGISTER
 }
     
 void JSRuntime::EvaluateJavascriptSource(const std::string& source) {

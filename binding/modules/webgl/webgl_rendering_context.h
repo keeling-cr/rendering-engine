@@ -18,6 +18,7 @@ namespace bind {
 
 class WebGLBuffer;
 class WebGLShader;
+class WebGLProgram;
 class WebGLObjectInterface;
 
 class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
@@ -40,6 +41,11 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     WebGLShader* CreateShader(GLenum type);
     void ShaderSource(WebGLShader* shader, const std::string& source);
     void CompileShader(WebGLShader* shader);
+
+    WebGLProgram* CreateProgram();
+    void LinkProgram(WebGLProgram* program);
+    void UseProgram(WebGLProgram* program);
+    void AttachShader(WebGLProgram* program, WebGLShader* shader);
   private:
     bool InitGlfw();
     bool ValidateObject(WebGLObjectInterface* object);
@@ -61,6 +67,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     // todo(liqining): memory release
     std::map<GLuint, WebGLBuffer*> buffer_map_;
     std::map<GLuint, WebGLShader*> shader_map_;
+    std::map<GLuint, WebGLProgram*> program_map_;
 };
 
 } // namespace bind
