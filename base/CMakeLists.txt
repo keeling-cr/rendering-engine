@@ -12,6 +12,7 @@ set(BASE_SOURCE
     third_party/icu/icu_utf.cc
     time/time.cc
     time/time_override.cc
+    system/system_utils.cc
     )
 
 if (APPLE)
@@ -37,6 +38,7 @@ if (APPLE)
         mac/scoped_mach_vm.cc
         mac/scoped_nsautorelease_pool.mm
         strings/sys_string_conversions_mac.mm
+        system/system_utils_posix.cc
     )
 endif ()
 
