@@ -49,7 +49,7 @@ if (APPLE)
 endif ()
 
 if (WIN)
-    list(APPEND BASE_LIBRARIES
+    list(APPEND BASE_SOURCE
         scoped_clear_last_error_win.cc
     )
 endif ()

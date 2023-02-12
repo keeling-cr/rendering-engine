@@ -78,3 +78,11 @@
     - COLOR_BUFFER_BIT
     - TRIANGLES
     - UNSIGNED_SHORT
+
+### Angle
+1. EGLWindow
+2. egl_autogen
+    - egl_get_config
+    - egl_get_current_display
+3. gles_autogen
+4. library_loader

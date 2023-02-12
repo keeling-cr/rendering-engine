@@ -17,8 +17,10 @@ include_directories(
     ${nica}/third_party/test
     ${nica}/third_party/glad
     ${nica}/third_party/glfw/include
+    ${nica}/third_party/angle/include
 )
 
+add_subdirectory(angle)
 add_subdirectory(base)
 add_subdirectory(core)
 add_subdirectory(binding)
@@ -41,5 +43,6 @@ target_link_libraries(${PROJECT_NAME}
     ${GLFW_LIBRARY}
     libbase
     libcore
-    libv8bind)
+    libv8bind
+    libangleutil)
 
