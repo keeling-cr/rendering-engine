@@ -7,6 +7,7 @@ list(APPEND ANGLE_LIBRARIES
 set(ANGLE_UTIL_SOURCE 
     egl_window.cc
     egl_loader_autogen.cc
+    gles_loader_autogen.cc
     os_window.cc
     platform/osx/osx_window.mm)
 
