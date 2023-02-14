@@ -23,6 +23,8 @@ class OSWindow {
     int GetWidth() const;
     int GetHeight() const;
 
+    virtual void SetVisible(bool visible)            = 0;
+    virtual void MessageLoop() = 0;
     virtual void ResetNativeWindow() = 0;
     virtual EGLNativeWindowType GetNativeWindow() const = 0;
     virtual void SetNativeDisplay(EGLNativeDisplayType display) {}

@@ -15,6 +15,8 @@ class OSXWindow : public angle::OSWindow {
 
     void Destroy() override;
 
+    void SetVisible(bool visible) override;
+    void MessageLoop() override;
     void ResetNativeWindow() override;
     EGLNativeWindowType GetNativeWindow() const override;
     EGLNativeDisplayType GetNativeDisplay() const override;

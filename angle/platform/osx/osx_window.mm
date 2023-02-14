@@ -23,6 +23,19 @@
 }
 @end
 
+// The Delegate receiving application-wide events.
+@interface ApplicationDelegate : NSObject
+@end
+
+@implementation ApplicationDelegate
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+    return NSTerminateCancel;
+}
+@end
+static ApplicationDelegate *gApplicationDelegate = nil;
+
+
 static bool InitializeAppKit() {
     if (NSApp != nil) {
         return true;
@@ -34,8 +47,17 @@ static bool InitializeAppKit() {
     // Make us appear in the dock
     [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 
+    // Register our global event handler
+    gApplicationDelegate = [[ApplicationDelegate alloc] init];
+    if (gApplicationDelegate == nil)
+    {
+        return false;
+    }
+    [NSApp setDelegate:static_cast<id>(gApplicationDelegate)];
+
     // Set our status to "started" so we are not bouncing in the doc and can activate
     [NSApp finishLaunching];
+    LOG(ERROR) << "keilingnica " << __func__;
     return true;
 }
 
@@ -51,6 +73,7 @@ bool OSXWindow::InitializeImpl(const std::string &name, int width, int height) {
         return false;
     }
 
+    // LOG(ERROR) << "keilingnica " << __func__;
     unsigned int styleMask = NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask |
                              NSMiniaturizableWindowMask;
     window_ = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, width, height)
@@ -63,6 +86,7 @@ bool OSXWindow::InitializeImpl(const std::string &name, int width, int height) {
     }
 
     view_ = [NSView alloc];
+    [view_ init];
     if (view_ == nil) {
         return false;
     }
@@ -74,12 +98,13 @@ bool OSXWindow::InitializeImpl(const std::string &name, int width, int height) {
     [window_ setAcceptsMouseMovedEvents:YES];
     [window_ center];
 
-    // [NSApp activateIgnoringOtherApps:YES];
-
+    [NSApp activateIgnoringOtherApps:YES];
+    // [NSAppbeginModalSessionForWindow:window_]
     x_      = 0;
     y_      = 0;
     width_  = width;
     height_ = height;
+    LOG(ERROR) << "keilingnica " << __func__;
 
     return true;
 }
@@ -90,6 +115,49 @@ void OSXWindow::Destroy() {
     [window_ setContentView:nil];
     [window_ release];
     window_ = nil;
+}
+
+void OSXWindow::MessageLoop() {
+    @autoreleasepool
+    {
+        while (true)
+        {
+            // TODO(http://anglebug.com/6570): @try/@catch is a workaround for
+            // exceptions being thrown from Cocoa-internal function
+            // NS_setFlushesWithDisplayLink starting in macOS 11.
+            @try
+            {
+                NSEvent *event = [NSApp nextEventMatchingMask:NSAnyEventMask
+                                                    untilDate:[NSDate distantPast]
+                                                       inMode:NSDefaultRunLoopMode
+                                                      dequeue:YES];
+                if (event == nil)
+                {
+                    break;
+                }
+
+                if ([event type] == NSAppKitDefined)
+                {
+                    continue;
+                }
+                [NSApp sendEvent:event];
+            }
+            @catch (NSException *localException)
+            {
+                NSLog(@"*** OSXWindow discarding exception: <%@> %@", [localException name],
+                      [localException reason]);
+            }
+        }
+    }
+}
+
+void OSXWindow::SetVisible(bool visible) {
+    if (visible) {
+        [window_ makeKeyAndOrderFront:nil];
+    }
+    else {
+        [window_ orderOut:nil];
+    }
 }
 
 void OSXWindow::ResetNativeWindow() {}
