@@ -1,4 +1,5 @@
 set(CORE_SOURCE 
+    typed_array/array_buffer_contents.cc
     arguments.cc
     js_isolate.cc
     js_runtime.cc
