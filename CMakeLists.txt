@@ -7,8 +7,6 @@ add_definitions(-DV8_COMPRESS_POINTERS)
 add_definitions(-DV8_ENABLE_SANDBOX)
 
 find_library(OPENGL_LIBRARY OpenGL)
-find_library(GLFW_LIBRARY glfw)
-find_library(GLEW_LIBRARY GLEW)
 
 include_directories(
     ${nica}
@@ -39,8 +37,6 @@ add_executable(${PROJECT_NAME} ${nica}/test.cc)
 target_link_libraries(${PROJECT_NAME} 
     ${V8_LIBS}
     ${OPENGL_LIBRARY}
-    ${GLEW_LIBRARY}
-    ${GLFW_LIBRARY}
     libbase
     libcore
     libv8bind

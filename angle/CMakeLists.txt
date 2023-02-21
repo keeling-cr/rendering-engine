@@ -5,6 +5,8 @@ list(APPEND ANGLE_LIBRARIES
 )
 
 set(ANGLE_UTIL_SOURCE 
+    shader_util.cc
+    config_params.cc
     egl_window.cc
     egl_loader_autogen.cc
     gles_loader_autogen.cc

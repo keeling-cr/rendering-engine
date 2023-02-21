@@ -41,6 +41,24 @@ struct Converter<int32_t> {
 };
 
 template<>
+struct Converter<long> {
+  static v8::Local<v8::Value> ToV8(v8::Isolate* isolate,
+                                    long val);
+  static bool FromV8(v8::Isolate* isolate,
+                     v8::Local<v8::Value> val,
+                     long* out);
+};
+
+template<>
+struct Converter<unsigned char> {
+  static v8::Local<v8::Value> ToV8(v8::Isolate* isolate,
+                                    unsigned char val);
+  static bool FromV8(v8::Isolate* isolate,
+                     v8::Local<v8::Value> val,
+                     unsigned char* out);
+};
+
+template<>
 struct Converter<uint32_t> {
   static v8::Local<v8::Value> ToV8(v8::Isolate* isolate,
                                     uint32_t val);

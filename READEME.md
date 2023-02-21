@@ -8,17 +8,20 @@
 
 ### TODO:
 1. v8 memory leak
-    确定先每个fucntion 没有加 handlescope 是否合理
+    1. 确定先每个fucntion 没有加 handlescope 是否合理
+    2. Constructing the ArrayBuffer many times.
 2. debug 调试crash
 3. binding 代码优化
     - remove wrapper info
     - optimize wrappable object
+    - 减少不必要的对象构造和销毁过程
 4. jsruntime 提供生命周期钩子，确定每个时期需要做的事情
 5. persistent 对象提供垃圾回收机制
 6. 统一 v8object 和 wrapper 对象
 7. functiontemplate builder constructur parent class provide base static constructor
 8. v8 头文件引用规范
 9. 支持 messagepump
+
 
 ## DEMO 形态
 

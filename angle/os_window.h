@@ -14,6 +14,7 @@ class OSWindow {
   public:
     static OSWindow *New();
     static void Delete(OSWindow** os_window);
+    virtual ~OSWindow();
 
     bool Initialize(const std::string &name, int width, int height);
     virtual void Destroy()                   = 0;
@@ -35,7 +36,6 @@ class OSWindow {
 
   protected:
     OSWindow();
-    virtual ~OSWindow();
 
     virtual bool InitializeImpl(const std::string &name, int width, int height) = 0;
 

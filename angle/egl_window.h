@@ -23,7 +23,7 @@ class EGLWindow {
                             EGLint gles_major_version,
                             EGLint gles_minor_version,
                             EGLint profile_mask);
-        
+        ~EGLWindow();
         static void Delete(EGLWindow** window);
         
         static EGLBoolean FindEGLConfig(
@@ -62,7 +62,6 @@ class EGLWindow {
             EGLint gles_major_version, 
             EGLint gles_minor_version, 
             EGLint profile_mask);
-        ~EGLWindow();
 
         EGLContext CreateContext(EGLContext share, EGLint *extraAttributes);
         bool MakeCurrent(EGLContext context);

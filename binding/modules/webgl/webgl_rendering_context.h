@@ -8,11 +8,10 @@
 #include "core/converter.h"
 #include "core/js_isolate.h"
 #include "core/js_context.h"
-#include "v8-template.h"
+#include "core/typed_array/array_buffer.h"
 #include "core/v8_object.h"
 
-#include <glad/glad.h> 
-#include <GLFW/glfw3.h>
+#include "angle/gles_loader_autogen.h"
 
 namespace bind {
 
@@ -35,6 +34,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     
     unsigned long context_id() { return context_id_; }
 
+    void BufferData(GLenum target, nica::ArrayBuffer buffer, GLenum usage);
     void ClearColor(float read, float green, float blue, float alpha);
     WebGLBuffer* CreateBuffer();
     void BindBuffer(GLenum target, WebGLBuffer* buffer);
@@ -48,9 +48,19 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void AttachShader(WebGLProgram* program, WebGLShader* shader);
 
     GLint GetAttribLocation(WebGLProgram* program, const std::string& name);
+
+    void VertexAttribPointer(
+      GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLintptr offset);
+    void EnableVertexAttribArray(GLuint index);
+
+    void Clear(GLbitfield mask);
+    void Enable(GLenum cap);
+    void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
+    void DrawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset);
   private:
-    bool InitGlfw();
+    bool ValidateCapability(const char* function, GLenum cap);
     bool ValidateObject(WebGLObjectInterface* object);
+    bool ValidateBufferDataParameters(const char* function, GLenum target, GLenum usage);
     bool RequireObject(const void* object);
 
     template<class T>
@@ -63,10 +73,8 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void set_gl_error(GLenum error);
     GLenum gl_error();
 
-    GLFWwindow* window_ = nullptr;    
     unsigned long context_id_;
     GLenum gl_error_;
-    // todo(liqining): memory release
     std::map<GLuint, WebGLBuffer*> buffer_map_;
     std::map<GLuint, WebGLShader*> shader_map_;
     std::map<GLuint, WebGLProgram*> program_map_;

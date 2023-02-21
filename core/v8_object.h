@@ -129,7 +129,7 @@ struct Converter<T*,
 
   static bool FromV8(v8::Isolate* isolate, v8::Local<v8::Value> val, T** out) {
     *out = static_cast<T*>(V8ObjectBase::FromV8Object(val, &T::kWrapperInfo));
-    return *out != NULL;
+    return true;
   }
 };
 

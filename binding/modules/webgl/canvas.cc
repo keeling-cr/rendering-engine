@@ -1,9 +1,20 @@
 #include "binding/modules/webgl/canvas.h"
+
+#include "angle/config_params.h"
+#include "angle/angle_util.h"
 #include "base/logging.h"
 
 namespace bind {
 
 namespace {
+const char* kAngleWindowName = "nica";
+const int kAngleRedBits = 8;
+const int kAngleGreenBits = 8;
+const int kAngleBlueBits = 8;
+const int kAngleAlphaBits = 8;
+const int kAngleDepthBits = 24;
+const int kAngleStencilBits = 8;
+
 void CanvasNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
     v8::Isolate* isolate = args.GetIsolate();
     v8::HandleScope handle_scope(isolate);
@@ -36,7 +47,35 @@ Canvas::Canvas(
     int width, int height)
     : V8Object(isolate, instance)
     , width_(width)
-    , height_(height) {}
+    , height_(height) {
+    // EGL2.0
+    EGLenum egl_client_type = EGL_OPENGL_ES_API;
+    EGLint gl_major_version = 2;
+    EGLint gl_minor_version = 0;
+    EGLint profile_mask    = 0;
+
+    os_window_.reset(angle::OSWindow::New());
+    egl_window_.reset(angle::EGLWindow::New(
+        egl_client_type, gl_major_version, gl_minor_version, profile_mask));
+    os_window_->SetVisible(true);
+
+    angle::ConfigParameters config_params;
+    config_params.red_bits     = kAngleRedBits;
+    config_params.green_bits   = kAngleGreenBits;
+    config_params.blue_bits    = kAngleBlueBits;
+    config_params.alpha_bits   = kAngleAlphaBits;
+    config_params.depth_bits   = kAngleDepthBits;
+    config_params.stencil_bits = kAngleStencilBits;
+
+    if (!egl_window_->InitializeGL(os_window_.get(), angle::AngleEGLLibrary(), config_params)) {
+        LOG(ERROR) << "keilingnica initialize gl error";
+    }
+
+    // Disable vsync
+    if (!egl_window_->SetSwapInterval(0)) {
+        LOG(ERROR) << "keilingnica swap interval erro";
+    }
+}
 
 Canvas::~Canvas() = default;
 

@@ -1,5 +1,4 @@
 set(BIND_SOURCE 
-    modules/webgl/glad.c
     modules/console/console.cc
     modules/webgl/canvas.cc
     modules/test/bind_test.cc

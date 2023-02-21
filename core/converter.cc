@@ -65,6 +65,28 @@ bool Converter<int32_t>::FromV8(Isolate* isolate,
   return true;
 }
 
+Local<Value> Converter<long>::ToV8(Isolate* isolate, long val) {
+  return Integer::New(isolate, val).As<Value>(); }
+
+bool Converter<long>::FromV8(Isolate* isolate,
+                                Local<Value> val,
+                                long* out) {
+  if (!val->IsInt32())
+    return false;
+  *out = val.As<Int32>()->Value();
+  return true;
+}
+
+Local<Value> Converter<unsigned char>::ToV8(Isolate* isolate, unsigned char val) {
+  return Integer::NewFromUnsigned(isolate, val).As<Value>(); }
+
+bool Converter<unsigned char>::FromV8(Isolate* isolate,
+                                Local<Value> val,
+                                unsigned char* out) {  
+  *out = val.As<Uint32>()->Value();
+  return true;
+}
+
 Local<Value> Converter<uint32_t>::ToV8(Isolate* isolate, uint32_t val) {
   return Integer::NewFromUnsigned(isolate, val).As<Value>();
 }
@@ -72,7 +94,7 @@ Local<Value> Converter<uint32_t>::ToV8(Isolate* isolate, uint32_t val) {
 bool Converter<uint32_t>::FromV8(Isolate* isolate,
                                  Local<Value> val,
                                  uint32_t* out) {
-  if (!val->IsUint32())
+  if (!val->IsNumber())
     return false;
   *out = val.As<Uint32>()->Value();
   return true;

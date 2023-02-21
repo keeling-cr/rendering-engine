@@ -10,6 +10,9 @@
 #include "core/js_context.h"
 #include "core/v8_object.h"
 #include "v8-template.h"
+#include "angle/egl_window.h"
+#include "angle/os_window.h"
+#include "angle/platform/osx/osx_window.h"
 
 
 namespace bind {
@@ -37,7 +40,9 @@ class Canvas : public nica::V8Object<Canvas>{
 
     int width_;
     int height_;
-
+    
+    std::unique_ptr<angle::EGLWindow> egl_window_;
+    std::unique_ptr<angle::OSWindow> os_window_;
     std::unique_ptr<WebGLRenderingContext> webgl_rendering_context_;
 };
 
