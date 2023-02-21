@@ -58,6 +58,10 @@ Canvas::Canvas(
     egl_window_.reset(angle::EGLWindow::New(
         egl_client_type, gl_major_version, gl_minor_version, profile_mask));
     os_window_->SetVisible(true);
+    
+    if (!os_window_->Initialize(kAngleWindowName, width, height)){
+        LOG(ERROR) << "keilingnica initialize os window error";
+    }
 
     angle::ConfigParameters config_params;
     config_params.red_bits     = kAngleRedBits;
