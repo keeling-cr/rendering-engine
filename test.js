@@ -1,32 +1,34 @@
-"Hello, world!"
-console.log("keilingnica hello world log");
-var a = new Canvas(3, 1);
-// console.log(a.width, " ", a.height);
-// var b = a.getContext()
+var canvas = new Canvas(1000, 1000);
 
-var vertices = [
-    -0.5,0.5,0.0,
-    -0.5,-0.5,0.0,
-    0.5,-0.5,0.0, 
-];
+gl = canvas.getContext();
+      
+/*======== Defining and storing the geometry ===========*/
 
-var farray = new Float32Array(vertices)
-console.log(farray)
+gl.viewport(0,0,canvas.width,canvas.height);
 
-var gl = a.getContext()         
+const vertShader = gl.createShader(gl.VERTEX_SHADER);
+gl.shaderSource(vertShader, 'attribute vec3 c;void main(void){gl_Position=vec4(c, 1.0);}');
+gl.compileShader(vertShader);
+const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+gl.shaderSource(fragShader, 'void main(void){gl_FragColor=vec4(0,1,1,1);}');
+gl.compileShader(fragShader);
+const prog = gl.createProgram();
+gl.attachShader(prog, vertShader);
+gl.attachShader(prog, fragShader);
+gl.linkProgram(prog);
+gl.useProgram(prog);
 
-var vertex_buffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+gl.clearColor(1, 0, 1, 1);
+gl.clear(gl.COLOR_BUFFER_BIT);
 
-// Create a vertex shader object
-var vertShader = gl.createShader(gl.VERTEX_SHADER);
+const vertexBuf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([ -0.5,0.5,0.0,  -0.5,-0.5,0.0,  0.5,-0.5,0.0 ]), gl.STATIC_DRAW);
 
-// bindTest.test()
-// console.log(bindTest.testwithreturn())
-// console.log(bindTest.testwithparam(1, 1))
+const coord = gl.getAttribLocation(prog, "c");
+gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(coord);
 
-// var b = new DynamicBindTest();
-// b.test()
-// console.log(b.testwithreturn())
-// console.log(b.testwithparam(1, 1))
-// console.log(b.width)
+gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+canvas.swapBufferForTest();

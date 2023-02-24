@@ -290,6 +290,8 @@ void WebGLRenderingContext::Enable(GLenum cap) {
 
 void WebGLRenderingContext::Viewport(
     GLint x, GLint y, GLsizei width, GLsizei height) {
+    LOG(ERROR) << "keilingnica Viewport width " << width;
+    LOG(ERROR) << "keilingnica Viewport height " << height;
     glViewport(x, y, width, height);
 }
 
