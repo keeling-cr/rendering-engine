@@ -6,7 +6,7 @@
 
 #include "base/system/system_utils.h"
 #include "base/logging.h"
-#include "angle/os_window.h"
+#include "platform/window/os_window.h"
 
 namespace angle {
 
@@ -68,7 +68,7 @@ bool EGLWindow::SetSwapInterval(EGLint swap_interval) {
     return true;
 }
 
-bool EGLWindow::InitializeGL(OSWindow* os_window,
+bool EGLWindow::InitializeGL(platform::OSWindow* os_window,
         base::Library* gl_window_library,
         const ConfigParameters& config_params) {
     return InitializeGLWithResult(
@@ -76,7 +76,7 @@ bool EGLWindow::InitializeGL(OSWindow* os_window,
 }
 
 GLWindowResult 
-EGLWindow::InitializeGLWithResult(OSWindow *os_window,
+EGLWindow::InitializeGLWithResult(platform::OSWindow *os_window,
                             base::Library* gl_window_library,
                             const ConfigParameters& config_params) {
     if (!InitializeDisplay(gl_window_library, os_window)) {
@@ -95,7 +95,7 @@ EGLWindow::InitializeGLWithResult(OSWindow *os_window,
 
 bool EGLWindow::InitializeDisplay(
     base::Library* library,
-    OSWindow* window) {
+    platform::OSWindow* window) {
     PFNEGLGETPROCADDRESSPROC getProcAddress;
     library->GetAs("eglGetProcAddress", &getProcAddress);
     if (!getProcAddress) {
@@ -142,7 +142,7 @@ bool EGLWindow::InitializeDisplay(
     return true;
 }
 
-GLWindowResult EGLWindow::InitializeSurface(OSWindow *window,
+GLWindowResult EGLWindow::InitializeSurface(platform::OSWindow *window,
                                             base::Library* gl_window_library,
                                             const ConfigParameters &params)  {
     config_params_                 = params;

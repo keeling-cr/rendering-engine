@@ -3,6 +3,7 @@
 #include "angle/config_params.h"
 #include "angle/angle_util.h"
 #include "base/logging.h"
+#include "platform/window/util.h"
 
 namespace bind {
 
@@ -54,14 +55,8 @@ Canvas::Canvas(
     EGLint gl_minor_version = 0;
     EGLint profile_mask    = 0;
 
-    os_window_.reset(angle::OSWindow::New());
     egl_window_.reset(angle::EGLWindow::New(
         egl_client_type, gl_major_version, gl_minor_version, profile_mask));
-    os_window_->SetVisible(true);
-    
-    if (!os_window_->Initialize(kAngleWindowName, width, height)){
-        LOG(ERROR) << "keilingnica initialize os window error";
-    }
 
     angle::ConfigParameters config_params;
     config_params.red_bits     = kAngleRedBits;
@@ -71,7 +66,7 @@ Canvas::Canvas(
     config_params.depth_bits   = kAngleDepthBits;
     config_params.stencil_bits = kAngleStencilBits;
 
-    if (!egl_window_->InitializeGL(os_window_.get(), angle::AngleEGLLibrary(), config_params)) {
+    if (!egl_window_->InitializeGL(platform::GetPlatformWindow(), angle::AngleEGLLibrary(), config_params)) {
         LOG(ERROR) << "keilingnica initialize gl error";
     }
 
@@ -93,11 +88,17 @@ WebGLRenderingContext* Canvas::GetContext() {
     return webgl_rendering_context_.get();
 }
 
+void Canvas::SwapBufferForTest() {
+    LOG(ERROR) << "egl window initialize state: " << egl_window_->IsGLInitialized();
+    egl_window_->Swap();
+}
+
 nica::FunctionTemplateBuilder 
 Canvas::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     return nica::FunctionTemplateBuilder(isolate, CanvasNew)
             .SetMethod("getContext", std::function<WebGLRenderingContext*(Canvas*)>{&Canvas::GetContext})
+            .SetMethod("swapBufferForTest", std::function<void(Canvas*)>{&Canvas::SwapBufferForTest})
             .SetProperty("width", std::function<int(Canvas*)>{&Canvas::width}, std::function<void(Canvas*, int)>{&Canvas::SetWidth})
             .SetProperty("height", std::function<int(Canvas*)>{&Canvas::height}, std::function<void(Canvas*, int)>{&Canvas::SetHeight});
 }

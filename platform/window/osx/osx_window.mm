@@ -1,7 +1,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "angle/platform/osx/osx_window.h"
+#include "platform/window/osx/osx_window.h"
 #include "base/logging.h"
 
 // On OSX 10.12 a number of AppKit interfaces have been renamed for consistency, and the previous
@@ -175,6 +175,6 @@ NSWindow *OSXWindow::GetNSWindow() const {
 }
 
 // static
-angle::OSWindow* angle::OSWindow::New() {
+platform::OSWindow* platform::OSWindow::New() {
     return new OSXWindow;
 }

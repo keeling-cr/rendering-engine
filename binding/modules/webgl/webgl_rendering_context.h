@@ -55,6 +55,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void Enable(GLenum cap);
     void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
     void DrawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset);
+    void DrawArrays(GLenum mode, GLint first, GLsizei count);
   private:
     bool ValidateCapability(const char* function, GLenum cap);
     bool ValidateObject(WebGLObjectInterface* object);

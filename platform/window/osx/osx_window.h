@@ -1,14 +1,14 @@
-#ifndef ANGLE_PLATFORM_OSX_OSX_WINDOW_H_
-#define ANGLE_PLATFORM_OSX_OSX_WINDOW_H_
+#ifndef PLATFORM_WINDOW_OSX_OSX_WINDOW_H_
+#define PLATFORM_WINDOW_OSX_OSX_WINDOW_H_
 
-#include "angle/os_window.h"
+#include "platform/window/os_window.h"
 
 #ifndef __OBJC__
 class NSWindow;
 class NSView;
 #endif
 
-class OSXWindow : public angle::OSWindow {
+class OSXWindow : public platform::OSWindow {
   public:
     OSXWindow();
     ~OSXWindow() override;
@@ -30,4 +30,4 @@ class OSXWindow : public angle::OSWindow {
     NSView* view_;
 };
 
-#endif  // ANGLE_PLATFORM_OSX_OSX_WINDOW_H_
+#endif  // PLATFORM_WINDOW_OSX_OSX_WINDOW_H_

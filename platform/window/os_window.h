@@ -1,5 +1,5 @@
-#ifndef ANGLE_OS_WINDOW_H_
-#define ANGLE_OS_WINDOW_H_
+#ifndef PLATFORM_WINDOW_OS_WINDOW_H_
+#define PLATFORM_WINDOW_OS_WINDOW_H_
 
 #include <stdint.h>
 #include <list>
@@ -8,7 +8,7 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-namespace angle {
+namespace platform {
 
 class OSWindow {
   public:
@@ -45,6 +45,6 @@ class OSWindow {
     int height_;
     bool valid_;
 };
-} // namespace angle
+} // namespace platform
 
-#endif  // ANGLE_OS_WINDOW_H_
+#endif  // PLATFORM_WINDOW_OS_WINDOW_H_

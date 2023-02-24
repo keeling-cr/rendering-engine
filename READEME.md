@@ -21,6 +21,7 @@
 7. functiontemplate builder constructur parent class provide base static constructor
 8. v8 头文件引用规范
 9. 支持 messagepump
+10. support gesture input
 
 
 ## DEMO 形态

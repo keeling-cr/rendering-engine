@@ -296,6 +296,14 @@ void WebGLRenderingContext::Viewport(
 void WebGLRenderingContext::DrawElements(
     GLenum mode, GLsizei count, GLenum type, GLintptr offset) {
     glDrawElements(mode, count, type, reinterpret_cast<GLvoid*>(static_cast<intptr_t>(offset)));
+    LOG(ERROR) << "keilingnica gl error " << glGetError() << " " << __func__;
+    //todo(liqining): remove it, it should be triggered by vsync
+}
+
+void WebGLRenderingContext::DrawArrays(
+    GLenum mode, GLint first, GLsizei count) {
+    glDrawArrays(mode, first, count);
+    LOG(ERROR) << "keilingnica gl error " << glGetError() << " " << __func__;
 }
 
 void WebGLRenderingContext::Clear(GLbitfield mask) {
@@ -312,6 +320,7 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     nica::FunctionTemplateBuilder builder(isolate, nullptr);
     builder.SetMethod("clear", std::function<void(WebGLRenderingContext*, GLbitfield)>{&WebGLRenderingContext::Clear});
     builder.SetMethod("drawElements", std::function<void(WebGLRenderingContext*, GLenum, GLsizei, GLenum, GLintptr)>{&WebGLRenderingContext::DrawElements});
+    builder.SetMethod("drawArrays", std::function<void(WebGLRenderingContext*, GLenum, GLint, GLsizei)>{&WebGLRenderingContext::DrawArrays});
     builder.SetMethod("viewport", std::function<void(WebGLRenderingContext*, GLint, GLint, GLsizei, GLsizei)>{&WebGLRenderingContext::Viewport});
     builder.SetMethod("enable", std::function<void(WebGLRenderingContext*, GLenum)>{&WebGLRenderingContext::Enable});
     builder.SetMethod("enableVertexAttribArray", std::function<void(WebGLRenderingContext*, GLuint)>{&WebGLRenderingContext::EnableVertexAttribArray});

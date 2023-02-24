@@ -1,3 +1,5 @@
+#ifndef ANGLE_DEBUG_UTIL_H_
+#define ANGLE_DEBUG_UTIL_H_
 #include <cstdio>
 
 #include "angle/gles_loader_autogen.h"
@@ -120,3 +122,4 @@ void EnableOpenGLDebug() {
 }
 
 } // namespace angle
+#endif //ANGLE_DEBUG_UTIL_H_

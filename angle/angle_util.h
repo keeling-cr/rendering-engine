@@ -1,3 +1,5 @@
+#ifndef ANGLE_ANGLE_UTIL_H_
+#define ANGLE_ANGLE_UTIL_H_
 #include "base/system/system_utils.h"
 
 namespace angle {
@@ -15,3 +17,4 @@ base::Library* AngleEGLLibrary() {
 }
 
 } // namespace angle
+#endif // ANGLE_ANGLE_UTIL_H_ 

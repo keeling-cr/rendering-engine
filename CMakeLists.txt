@@ -22,6 +22,7 @@ add_subdirectory(angle)
 add_subdirectory(base)
 add_subdirectory(core)
 add_subdirectory(binding)
+add_subdirectory(platform)
 
 link_directories(
     ${nica}/third_party/v8/libs
@@ -37,6 +38,7 @@ add_executable(${PROJECT_NAME} ${nica}/test.cc)
 target_link_libraries(${PROJECT_NAME} 
     ${V8_LIBS}
     ${OPENGL_LIBRARY}
+    libnicaplatform
     libbase
     libcore
     libv8bind

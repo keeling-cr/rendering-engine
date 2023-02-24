@@ -1,7 +1,7 @@
-#include "angle/os_window.h"
+#include "platform/window/os_window.h"
 #include "base/logging.h"
 
-namespace angle {
+namespace platform {
 
 OSWindow::OSWindow() 
     : x_(0), y_(0), width_(0), height_(0), valid_(false) {}
@@ -35,4 +35,4 @@ void OSWindow::Delete(OSWindow** window) {
     *window = nullptr;
 }
 
-} // namespace angle
+} // namespace platform

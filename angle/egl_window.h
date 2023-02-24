@@ -4,11 +4,14 @@
 #include "angle/egl_loader_autogen.h"
 #include "base/system/system_utils.h"
 #include "angle/config_params.h"
+
+namespace platform {
+class OSWindow;
+}
+
 namespace angle {
 
 class Library;
-class OSWindow;
-
 
 enum class GLWindowResult {
     NoError,
@@ -40,19 +43,19 @@ class EGLWindow {
         bool MakeCurrent(EGLSurface draw, EGLSurface read, EGLContext context);
         void Swap();
         
-        bool InitializeGL(OSWindow* os_window,
+        bool InitializeGL(platform::OSWindow* os_window,
                       base::Library* gl_window_library,
                       const ConfigParameters& config_params);
 
-        GLWindowResult InitializeGLWithResult(OSWindow *osWindow,
+        GLWindowResult InitializeGLWithResult(platform::OSWindow *osWindow,
                         base::Library *glWindowingLibrary,
                         const ConfigParameters &config_params);
 
         bool InitializeDisplay(
             base::Library* gl_window_library,
-            OSWindow* os_window);
+            platform::OSWindow* os_window);
         GLWindowResult InitializeSurface(
-            OSWindow* window, base::Library* gl_window_library, const ConfigParameters& params);
+            platform::OSWindow* window, base::Library* gl_window_library, const ConfigParameters& params);
         bool InitializeContext(); 
 
         bool IsGLInitialized() const;
