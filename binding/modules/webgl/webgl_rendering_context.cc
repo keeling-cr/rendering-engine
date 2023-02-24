@@ -1,5 +1,6 @@
 
 #include "angle/shader_util.h"
+#include "angle/debug_util.h"
 #include "binding/modules/webgl/webgl_rendering_context.h"
 #include "binding/modules/webgl/webgl_buffer.h"
 #include "binding/modules/webgl/webgl_object.h"
@@ -16,7 +17,9 @@ nica::WrapperInfo WebGLRenderingContext::kWrapperInfo = {
 
 WebGLRenderingContext:: WebGLRenderingContext(v8::Isolate* isolate)
     : V8Object(isolate)
-    , context_id_(s_context_counter++) {}
+    , context_id_(s_context_counter++) {
+    angle::EnableOpenGLDebug();
+}
 
 WebGLRenderingContext::~WebGLRenderingContext() {
     DeleteMapObjects(buffer_map_);
@@ -111,13 +114,13 @@ void WebGLRenderingContext::AttachShader(
 }
 
 void WebGLRenderingContext::LinkProgram(WebGLProgram* program) {
-  if (!RequireObject(program)) 
-    return;
-  if (!ValidateObject(program)) 
-    return;
+    if (!RequireObject(program)) 
+        return;
+    if (!ValidateObject(program)) 
+        return;
 
-  GLuint program_id = program->webgl_id();
-  glLinkProgram(program_id);
+    GLuint program_id = program->webgl_id();
+    glLinkProgram(program_id);
 }
 
 void WebGLRenderingContext::UseProgram(WebGLProgram* program) {
@@ -132,7 +135,7 @@ void WebGLRenderingContext::UseProgram(WebGLProgram* program) {
 
 GLint WebGLRenderingContext::GetAttribLocation(
     WebGLProgram* program, const std::string& name) {
-    if (!RequireObject(program)) 
+    if (!RequireObject(program))
         return -1;
     if (!ValidateObject(program))
         return -1;
@@ -151,35 +154,35 @@ void WebGLRenderingContext::VertexAttribPointer(
     if (size < 1 || size > 4 || stride < 0 || stride > 255 || offset < 0) {
         set_gl_error(GL_INVALID_VALUE);
         return;
-  }
+    }
 
-  uint32_t type_size = 0;
-  switch (type) {
-    case GL_BYTE:
-      type_size = sizeof(GLbyte);
-      break;
-    case GL_UNSIGNED_BYTE:
-      type_size = sizeof(GLubyte);
-      break;
-    case GL_SHORT:
-      type_size = sizeof(GLshort);
-      break;
-    case GL_UNSIGNED_SHORT:
-      type_size = sizeof(GLushort);
-      break;
-    case GL_FLOAT:
-      type_size = sizeof(GLfloat);
-      break;
-    default:
-      set_gl_error(GL_INVALID_ENUM);
-      return;
-  }
+    uint32_t type_size = 0;
+    switch (type) {
+        case GL_BYTE:
+            type_size = sizeof(GLbyte);
+            break;
+        case GL_UNSIGNED_BYTE:
+            type_size = sizeof(GLubyte);
+            break;
+        case GL_SHORT:
+            type_size = sizeof(GLshort);
+            break;
+        case GL_UNSIGNED_SHORT:
+            type_size = sizeof(GLushort);
+            break;
+        case GL_FLOAT:
+            type_size = sizeof(GLfloat);
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return;
+    }
 
-  if ((stride % type_size) || (offset % type_size)) {
-    set_gl_error(GL_INVALID_OPERATION);
-    return;
-  }
-  glVertexAttribPointer(index, size, type, normalized, stride, reinterpret_cast<GLvoid*>(static_cast<intptr_t>(offset)));
+    if ((stride % type_size) || (offset % type_size)) {
+        set_gl_error(GL_INVALID_OPERATION);
+        return;
+    }
+    glVertexAttribPointer(index, size, type, normalized, stride, reinterpret_cast<GLvoid*>(static_cast<intptr_t>(offset)));
 }
 
 void WebGLRenderingContext::BindBuffer(GLenum target, WebGLBuffer* buffer) {
@@ -273,10 +276,10 @@ GLenum WebGLRenderingContext::gl_error() {
 }
 
 void WebGLRenderingContext::BufferData(
-    GLenum target, nica::ArrayBuffer buffer, GLenum usage) {
+    GLenum target, nica::ArrayBufferView* buffer, GLenum usage) {
     if (!ValidateBufferDataParameters("bufferData", target, usage))
         return;
-    glBufferData(target, buffer.ByteLength(), buffer.Data(), usage);
+    glBufferData(target, buffer->ByteLength(), buffer->Data(), usage);
 }
 
 void WebGLRenderingContext::Enable(GLenum cap) {
@@ -299,8 +302,8 @@ void WebGLRenderingContext::Clear(GLbitfield mask) {
     if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
         set_gl_error(GL_INVALID_VALUE);
         return;
-  }
-  glClear(mask);
+    }
+    glClear(mask);
 }
 
 nica::FunctionTemplateBuilder 
@@ -318,9 +321,9 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("shaderSource", std::function<void(WebGLRenderingContext*, WebGLShader*, const std::string&)>{&WebGLRenderingContext::ShaderSource});
     builder.SetMethod("createShader", std::function<WebGLShader*(WebGLRenderingContext*, GLenum)>{&WebGLRenderingContext::CreateShader});
     builder.SetMethod("attachShader", std::function<void(WebGLRenderingContext*, WebGLProgram*, WebGLShader*)>{&WebGLRenderingContext::AttachShader});
-    builder.SetMethod("bufferData", std::function<void(WebGLRenderingContext*, GLenum , nica::ArrayBuffer, GLenum)>{&WebGLRenderingContext::BufferData});
+    builder.SetMethod("bufferData", std::function<void(WebGLRenderingContext*, GLenum, nica::ArrayBufferView*, GLenum)>{&WebGLRenderingContext::BufferData});
     builder.SetMethod("useProgram", std::function<void(WebGLRenderingContext*, WebGLProgram*)>{&WebGLRenderingContext::UseProgram});
-    builder.SetMethod("createProgram", std::function<void(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateProgram});
+    builder.SetMethod("createProgram", std::function<WebGLProgram*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateProgram});
     builder.SetMethod("linkProgram", std::function<void(WebGLRenderingContext*, WebGLProgram*)>{&WebGLRenderingContext::LinkProgram});
     builder.SetMethod("createBuffer", std::function<WebGLBuffer*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateBuffer});    
     builder.SetMethod("bindBuffer", std::function<void(WebGLRenderingContext*, GLenum, WebGLBuffer*)>{&WebGLRenderingContext::BindBuffer});

@@ -37,31 +37,36 @@ class ArrayBufferBase {
 
 };
 
-class ArrayBuffer : public ArrayBufferBase {
+class ArrayBufferView  : public ArrayBufferBase {
   public:
-    static ArrayBuffer* Create(ArrayBufferContents contents) {
-      return new ArrayBuffer(std::move(contents));
+    static ArrayBufferView* Create(ArrayBufferContents contents) {
+      return new ArrayBufferView(std::move(contents));
     }
 
-    ArrayBuffer() = default;
-    ~ArrayBuffer() { LOG(ERROR) << "todo(liqining): Don't forget release memory";}
+    ArrayBufferView() = default;
+    ~ArrayBufferView() { LOG(ERROR) << "todo(liqining): Don't forget release memory";}
 
-    explicit ArrayBuffer(ArrayBufferContents contents)
+    explicit ArrayBufferView(ArrayBufferContents contents)
       : ArrayBufferBase(std::move(contents)) {}
 
 };
 
 template <>
-struct Converter<ArrayBuffer> {
+struct Converter<ArrayBufferView*> {
   static bool FromV8(
-    v8::Isolate* isolate, v8::Local<v8::Value> val, ArrayBuffer* out) {
+    v8::Isolate* isolate, v8::Local<v8::Value> val, ArrayBufferView** out) {
       if (!val->IsTypedArray())
         return false;
-      v8::Local<v8::SharedArrayBuffer> v8_shared_array_buffer =
-        val.As<v8::SharedArrayBuffer>();
-      LOG(ERROR) << "keilingnica " << __func__;
-      ArrayBufferContents contents(v8_shared_array_buffer->GetBackingStore());
-      out = ArrayBuffer::Create(contents);
+
+      if (!val->IsArrayBufferView()) {
+        return false;
+      }
+      
+      v8::Local<v8::ArrayBufferView> view =
+          v8::Local<v8::ArrayBufferView>::Cast(val);
+      v8::Local<v8::ArrayBuffer> array_buffer = view->Buffer(); 
+      ArrayBufferContents contents(array_buffer->GetBackingStore());
+      *out = ArrayBufferView::Create(contents);
       return true;
     }
 };

@@ -6,8 +6,6 @@
 #include "core/wrappable.h"
 #include "core/function_template_builder.h"
 #include "core/converter.h"
-#include "core/js_isolate.h"
-#include "core/js_context.h"
 #include "core/typed_array/array_buffer.h"
 #include "core/v8_object.h"
 
@@ -34,7 +32,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     
     unsigned long context_id() { return context_id_; }
 
-    void BufferData(GLenum target, nica::ArrayBuffer buffer, GLenum usage);
+    void BufferData(GLenum target, nica::ArrayBufferView* buffer, GLenum usage);
     void ClearColor(float read, float green, float blue, float alpha);
     WebGLBuffer* CreateBuffer();
     void BindBuffer(GLenum target, WebGLBuffer* buffer);

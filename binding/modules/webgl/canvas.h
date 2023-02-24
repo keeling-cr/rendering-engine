@@ -6,8 +6,6 @@
 #include "core/function_template_builder.h"
 #include "core/wrappable.h"
 #include "core/converter.h"
-#include "core/js_isolate.h"
-#include "core/js_context.h"
 #include "core/v8_object.h"
 #include "v8-template.h"
 #include "angle/egl_window.h"

@@ -96,8 +96,21 @@ bool Converter<uint32_t>::FromV8(Isolate* isolate,
                                  uint32_t* out) {
   if (!val->IsNumber())
     return false;
-  *out = val.As<Uint32>()->Value();
-  return true;
+  
+  if (val->IsInt32()) {
+    int32_t tmp = val.As<Int32>()->Value();
+    if (tmp < 0) {
+      return false;
+    }
+    *out = static_cast<uint32_t>(tmp);
+    return true;
+  }
+
+  if (val->IsUint32()) {
+    *out = val.As<Uint32>()->Value();
+    return true;
+  } 
+  return false;
 }
 
 Local<Value> Converter<int64_t>::ToV8(Isolate* isolate, int64_t val) {
