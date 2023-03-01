@@ -23,6 +23,10 @@
 9. 支持 messagepump
 10. support gesture input
 
+## base library
+- refcount
+- sequence checker
+
 
 ## DEMO 形态
 

@@ -35,9 +35,9 @@ nica::ObjectTemplateBuilder
 BindTest::GetObjectTemplateBuilder(
     v8::Isolate* isolate) {
    return nica::Wrappable<BindTest>::GetObjectTemplateBuilder(isolate)
-        .SetMethod("test", std::function<void(BindTest*)>{&BindTest::TestBind})
-        .SetMethod("testwithreturn", std::function<int(BindTest*)>{&BindTest::TestBindWithReturn})
-        .SetMethod("testwithparam", std::function<int(BindTest*, int, int)>{&BindTest::TestBindWithParams});
+        .SetMethod("test", &BindTest::TestBind)
+        .SetMethod("testwithreturn", &BindTest::TestBindWithReturn)
+        .SetMethod("testwithparam", &BindTest::TestBindWithParams);
 }
 
 void BindTest::Register(

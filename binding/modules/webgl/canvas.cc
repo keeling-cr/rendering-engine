@@ -96,11 +96,12 @@ void Canvas::SwapBufferForTest() {
 nica::FunctionTemplateBuilder 
 Canvas::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
-    return nica::FunctionTemplateBuilder(isolate, CanvasNew)
-            .SetMethod("getContext", std::function<WebGLRenderingContext*(Canvas*)>{&Canvas::GetContext})
-            .SetMethod("swapBufferForTest", std::function<void(Canvas*)>{&Canvas::SwapBufferForTest})
-            .SetProperty("width", std::function<int(Canvas*)>{&Canvas::width}, std::function<void(Canvas*, int)>{&Canvas::SetWidth})
-            .SetProperty("height", std::function<int(Canvas*)>{&Canvas::height}, std::function<void(Canvas*, int)>{&Canvas::SetHeight});
+    nica::FunctionTemplateBuilder builder(isolate, CanvasNew);
+    builder.SetMethod("getContext", &Canvas::GetContext);
+    builder.SetMethod("swapBufferForTest", &Canvas::SwapBufferForTest);
+    builder.SetProperty("width", &Canvas::width, &Canvas::SetWidth);
+    builder.SetProperty("height", &Canvas::height, &Canvas::SetHeight);
+    return builder;
 }
 
 } // namespace bind

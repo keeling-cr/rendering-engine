@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "base/check.h"
+#include "base/callback.h"
 // todo(liqining):
 // #include "base/strings/strcat.h"
 #include "core/arguments.h"
@@ -62,7 +63,7 @@ template<typename Sig>
 class CallbackHolder : public CallbackHolderBase {
  public:
   CallbackHolder(v8::Isolate* isolate,
-                 Sig callback,
+                 base::RepeatingCallback<Sig>  callback,
                  InvokerOptions invoker_options)
       : CallbackHolderBase(isolate),
         callback(std::move(callback)),
@@ -70,7 +71,7 @@ class CallbackHolder : public CallbackHolderBase {
   CallbackHolder(const CallbackHolder&) = delete;
   CallbackHolder& operator=(const CallbackHolder&) = delete;
 
-  Sig callback;
+  base::RepeatingCallback<Sig> callback;
   InvokerOptions invoker_options;
 
  private:
@@ -146,13 +147,13 @@ class Invoker<std::index_sequence<indices...>, ArgTypes...>
   }
 
   template <typename ReturnType>
-  void DispatchToCallback(std::function<ReturnType(ArgTypes...)> callback) {
+  void DispatchToCallback(base::RepeatingCallback<ReturnType(ArgTypes...)> callback) {
     args_->Return(
-      std::invoke(callback, std::move(ArgumentHolder<indices, ArgTypes>::value)...));
+        callback.Run(std::move(ArgumentHolder<indices, ArgTypes>::value)...));
   }
 
-  void DispatchToCallback(std::function<void(ArgTypes...)> callback) {
-    std::invoke(callback, std::move(ArgumentHolder<indices, ArgTypes>::value)...);
+  void DispatchToCallback(base::RepeatingCallback<void(ArgTypes...)> callback) {
+    callback.Run(std::move(ArgumentHolder<indices, ArgTypes>::value)...);
   }
 
  private:
@@ -169,14 +170,14 @@ template <typename Sig>
 struct Dispatcher {};
 
 template <typename ReturnType, typename... ArgTypes>
-struct Dispatcher<std::function<ReturnType(ArgTypes...)>> {
+struct Dispatcher<ReturnType(ArgTypes...)> {
   static void DispatchToCallbackImpl(Arguments* args) {
     v8::Local<v8::External> v8_holder;
     CHECK(args->GetData(&v8_holder));
     CallbackHolderBase* holder_base = reinterpret_cast<CallbackHolderBase*>(
         v8_holder->Value());
 
-    typedef CallbackHolder<std::function<ReturnType(ArgTypes...)>> HolderT;
+    typedef CallbackHolder<ReturnType(ArgTypes...)> HolderT;
     HolderT* holder = static_cast<HolderT*>(holder_base);
 
     using Indices = std::index_sequence_for<ArgTypes...>;
@@ -204,7 +205,7 @@ struct Dispatcher<std::function<ReturnType(ArgTypes...)>> {
 template <typename Sig>
 v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
     v8::Isolate* isolate,
-    Sig callback,
+    base::RepeatingCallback<Sig> callback,
     InvokerOptions invoker_options = {}) {
   typedef internal::CallbackHolder<Sig> HolderT;
   HolderT* holder =
@@ -220,7 +221,7 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
 template <typename Sig>
 std::pair<v8::AccessorNameGetterCallback, v8::Local<v8::Value>>
 CreateDataPropertyCallback(v8::Isolate* isolate,
-                           Sig callback,
+                           base::RepeatingCallback<Sig> callback,
                            InvokerOptions invoker_options = {}) {
   typedef internal::CallbackHolder<Sig> HolderT;
   HolderT* holder =

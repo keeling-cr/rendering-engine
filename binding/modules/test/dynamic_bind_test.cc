@@ -64,10 +64,10 @@ nica::FunctionTemplateBuilder
 DynamicBindTest::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     return nica::FunctionTemplateBuilder(isolate, DynamicBindTestNew)
-            .SetMethod("test", std::function<void(DynamicBindTest*)>{&DynamicBindTest::TestBind})
-            .SetMethod("testwithreturn", std::function<int(DynamicBindTest*)>{&DynamicBindTest::TestBindWithReturn})
-            .SetMethod("testwithparam", std::function<int(DynamicBindTest*, int, int)>{&DynamicBindTest::TestBindWithParams})
-            .SetProperty("width", std::function<int(DynamicBindTest*)>{&DynamicBindTest::GetWidth}, std::function<void(DynamicBindTest*, int)>{&DynamicBindTest::SetWidth});
+            .SetMethod("test", &DynamicBindTest::TestBind)
+            .SetMethod("testwithreturn", &DynamicBindTest::TestBindWithReturn)
+            .SetMethod("testwithparam", &DynamicBindTest::TestBindWithParams)
+            .SetProperty("width", &DynamicBindTest::GetWidth, &DynamicBindTest::SetWidth);
 }
 
 } // namespace bind

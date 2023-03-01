@@ -14,7 +14,7 @@ namespace internal {
 
 template <typename T>
 v8::Local<v8::FunctionTemplate> CreateFunctionTemplateForFunction(v8::Isolate* isolate,
-                                                       std::function<T> callback,
+                                                       T callback,
                                                        const char* type_name) {
   InvokerOptions options;
   // todo(liqining): Suppoer non-member function using
@@ -22,7 +22,7 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplateForFunction(v8::Isolate* i
   options.holder_is_first_argument = true;
   options.holder_type = type_name;
   return ::nica::CreateFunctionTemplate(
-      isolate, std::move(callback), std::move(options));
+      isolate, base::BindRepeating(std::move(callback)), std::move(options));
 }
 
 }  // namespace internal

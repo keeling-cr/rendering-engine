@@ -320,25 +320,25 @@ nica::FunctionTemplateBuilder
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     nica::FunctionTemplateBuilder builder(isolate, nullptr);
-    builder.SetMethod("clear", std::function<void(WebGLRenderingContext*, GLbitfield)>{&WebGLRenderingContext::Clear});
-    builder.SetMethod("drawElements", std::function<void(WebGLRenderingContext*, GLenum, GLsizei, GLenum, GLintptr)>{&WebGLRenderingContext::DrawElements});
-    builder.SetMethod("drawArrays", std::function<void(WebGLRenderingContext*, GLenum, GLint, GLsizei)>{&WebGLRenderingContext::DrawArrays});
-    builder.SetMethod("viewport", std::function<void(WebGLRenderingContext*, GLint, GLint, GLsizei, GLsizei)>{&WebGLRenderingContext::Viewport});
-    builder.SetMethod("enable", std::function<void(WebGLRenderingContext*, GLenum)>{&WebGLRenderingContext::Enable});
-    builder.SetMethod("enableVertexAttribArray", std::function<void(WebGLRenderingContext*, GLuint)>{&WebGLRenderingContext::EnableVertexAttribArray});
-    builder.SetMethod("vertexAttribPointer", std::function<void(WebGLRenderingContext*,GLuint, GLint, GLenum, GLboolean, GLsizei, GLintptr)>{&WebGLRenderingContext::VertexAttribPointer});
-    builder.SetMethod("getAttribLocation", std::function<GLint(WebGLRenderingContext*, WebGLProgram*, const std::string&)>{&WebGLRenderingContext::GetAttribLocation});
-    builder.SetMethod("compileShader", std::function<void(WebGLRenderingContext*, WebGLShader*)>{&WebGLRenderingContext::CompileShader});
-    builder.SetMethod("shaderSource", std::function<void(WebGLRenderingContext*, WebGLShader*, const std::string&)>{&WebGLRenderingContext::ShaderSource});
-    builder.SetMethod("createShader", std::function<WebGLShader*(WebGLRenderingContext*, GLenum)>{&WebGLRenderingContext::CreateShader});
-    builder.SetMethod("attachShader", std::function<void(WebGLRenderingContext*, WebGLProgram*, WebGLShader*)>{&WebGLRenderingContext::AttachShader});
-    builder.SetMethod("bufferData", std::function<void(WebGLRenderingContext*, GLenum, nica::ArrayBufferView*, GLenum)>{&WebGLRenderingContext::BufferData});
-    builder.SetMethod("useProgram", std::function<void(WebGLRenderingContext*, WebGLProgram*)>{&WebGLRenderingContext::UseProgram});
-    builder.SetMethod("createProgram", std::function<WebGLProgram*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateProgram});
-    builder.SetMethod("linkProgram", std::function<void(WebGLRenderingContext*, WebGLProgram*)>{&WebGLRenderingContext::LinkProgram});
-    builder.SetMethod("createBuffer", std::function<WebGLBuffer*(WebGLRenderingContext*)>{&WebGLRenderingContext::CreateBuffer});    
-    builder.SetMethod("bindBuffer", std::function<void(WebGLRenderingContext*, GLenum, WebGLBuffer*)>{&WebGLRenderingContext::BindBuffer});
-    builder.SetMethod("clearColor", std::function<void(WebGLRenderingContext*, float, float, float, float)>{&WebGLRenderingContext::ClearColor});
+    builder.SetMethod("clear", &WebGLRenderingContext::Clear);
+    builder.SetMethod("drawElements", &WebGLRenderingContext::DrawElements);
+    builder.SetMethod("drawArrays", &WebGLRenderingContext::DrawArrays);
+    builder.SetMethod("viewport", &WebGLRenderingContext::Viewport);
+    builder.SetMethod("enable", &WebGLRenderingContext::Enable);
+    builder.SetMethod("enableVertexAttribArray", &WebGLRenderingContext::EnableVertexAttribArray);
+    builder.SetMethod("vertexAttribPointer", &WebGLRenderingContext::VertexAttribPointer);
+    builder.SetMethod("getAttribLocation", &WebGLRenderingContext::GetAttribLocation);
+    builder.SetMethod("compileShader", &WebGLRenderingContext::CompileShader);
+    builder.SetMethod("shaderSource", &WebGLRenderingContext::ShaderSource);
+    builder.SetMethod("createShader", &WebGLRenderingContext::CreateShader);
+    builder.SetMethod("attachShader", &WebGLRenderingContext::AttachShader);
+    builder.SetMethod("bufferData", &WebGLRenderingContext::BufferData);
+    builder.SetMethod("useProgram", &WebGLRenderingContext::UseProgram);
+    builder.SetMethod("createProgram", &WebGLRenderingContext::CreateProgram);
+    builder.SetMethod("linkProgram", &WebGLRenderingContext::LinkProgram);
+    builder.SetMethod("createBuffer", &WebGLRenderingContext::CreateBuffer);    
+    builder.SetMethod("bindBuffer", &WebGLRenderingContext::BindBuffer);
+    builder.SetMethod("clearColor", &WebGLRenderingContext::ClearColor);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    
