@@ -1,18 +1,22 @@
 set(BASE_SOURCE 
+    callback_internal.cc
     files/file_path.cc
     files/file_util.cc
     files/file.cc
     files/scoped_file.cc
     logging.cc
+    memory/ref_counted.cc
+    memory/weak_ptr.cc
     strings/string_number_conversions.cc
     strings/string_util.cc
     strings/stringprintf.cc
     strings/utf_string_conversions.cc
     strings/utf_string_conversion_utils.cc
+    synchronization/atomic_flag.cc
+    system/system_utils.cc
     third_party/icu/icu_utf.cc
     time/time.cc
     time/time_override.cc
-    system/system_utils.cc
     )
 
 if (APPLE)

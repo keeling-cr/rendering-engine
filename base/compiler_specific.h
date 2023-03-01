@@ -42,6 +42,13 @@
 #define ALWAYS_INLINE inline
 #endif
 
+// A wrapper around `__has_builtin`, similar to HAS_CPP_ATTRIBUTE.
+#if defined(__has_builtin)
+#define HAS_BUILTIN(x) __has_builtin(x)
+#else
+#define HAS_BUILTIN(x) 0
+#endif
+
 // The ANALYZER_ASSUME_TRUE(bool arg) macro adds compiler-specific hints
 // to Clang which control what code paths are statically analyzed,
 // and is meant to be used in conjunction with assert & assert-like functions.
