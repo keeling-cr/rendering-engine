@@ -1,6 +1,5 @@
 out
 doc
-third_party/v8
-third_party/angle
-third_party/napi
-third_party/test
+third_party/*
+!third_party/CMakeLists.txt
+!third_party/cmake

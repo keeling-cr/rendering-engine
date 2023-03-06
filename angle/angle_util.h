@@ -5,7 +5,7 @@
 namespace angle {
 
 namespace {
-const char* kAngleLibPath = "/Users/bytedance/rendering-engine/third_party/angle/libs/libEGL.dylib";
+const char* kAngleLibPath = "/Users/bytedance/rendering-engine/third_party/gen/angle/libs/libEGL.dylib";
 
 base::Library* g_angle_egl_library = nullptr;
 } // namespace
