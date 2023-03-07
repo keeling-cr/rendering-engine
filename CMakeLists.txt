@@ -7,6 +7,7 @@ project(nica)
 set(CMAKE_CXX_STANDARD 17)
 set(nica ${CMAKE_CURRENT_SOURCE_DIR})
 
+#TODO(liqining): Remove this option to third_party
 add_definitions(-DV8_COMPRESS_POINTERS)
 add_definitions(-DV8_ENABLE_SANDBOX)
 
@@ -32,7 +33,7 @@ find_library(OPENGL_LIBRARY OpenGL)
 include_directories(
     ${nica}
     ${nica}/base
-    ${nica}/third_party/v8/include
+    ${nica}/third_party/gen/v8/include
     ${nica}/third_party/gen/angle/include
 )
 
@@ -43,7 +44,7 @@ add_subdirectory(binding)
 add_subdirectory(platform)
 
 link_directories(
-    ${nica}/third_party/v8/libs
+    ${nica}/third_party/gen/v8/libs
 )
 
 set(V8_LIBS
