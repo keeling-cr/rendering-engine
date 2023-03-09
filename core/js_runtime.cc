@@ -10,8 +10,6 @@
 #include "core/try_catch.h"
 #include "binding/modules/console/console.h"
 #include "binding/modules/webgl/canvas.h"
-#include "binding/modules/test/bind_test.h"
-#include "binding/modules/test/dynamic_bind_test.h"
 #include "binding/modules/webgl/webgl_rendering_context.h"
 #include "binding/modules/webgl/webgl_buffer.h"
 #include "binding/modules/webgl/webgl_shader.h"
@@ -63,8 +61,6 @@ void JSRuntime::InstallBuiltinModule() {
 #define REGISTER(module) bind::module::Register(js_isolate_.get(),js_context_.get())
     REGISTER(Console);
     REGISTER(Canvas);
-    REGISTER(BindTest);
-    REGISTER(DynamicBindTest);
     REGISTER(WebGLRenderingContext);
     REGISTER(WebGLBuffer);
     REGISTER(WebGLShader);
