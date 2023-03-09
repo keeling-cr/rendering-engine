@@ -17,15 +17,21 @@ void V8ObjectBase::SetInstance(
     instance_local->SetAlignedPointerInInternalFields(2, indices, values);
 
     instance_.Reset(isolate, instance_local);
-// todo(liqining): v8 gc
-//   if (weak) {
-//     instance_.MarkIndependent();
-//     instance_.MakeWeak(this, WeakCallback);
-//   }
+    instance_.SetWeak(this, &V8ObjectBase::FirstWeakCallback,
+        v8::WeakCallbackType::kParameter);
 }
 
-void V8ObjectBase::WeakCallback(v8::Persistent<v8::Value> value, void* data) {
-  V8ObjectBase* object = static_cast<V8ObjectBase*>(data);
-  delete object;
+// static
+void V8ObjectBase::FirstWeakCallback(
+    const v8::WeakCallbackInfo<V8ObjectBase>& data) {
+  data.GetParameter()->instance_.Reset();
+  data.SetSecondPassCallback(SecondWeakCallback);
 }
+
+// static
+void V8ObjectBase::SecondWeakCallback(
+    const v8::WeakCallbackInfo<V8ObjectBase>& data) {
+  delete data.GetParameter();
+}
+
 } // namespace nica

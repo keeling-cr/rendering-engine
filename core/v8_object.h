@@ -13,6 +13,8 @@ namespace nica {
 
 class V8ObjectBase {
   public:
+    static void FirstWeakCallback(const v8::WeakCallbackInfo<V8ObjectBase>& data);
+    static void SecondWeakCallback(const v8::WeakCallbackInfo<V8ObjectBase>& data);
     inline static V8ObjectBase* FromV8Object(
         v8::Local<v8::Value> val, WrapperInfo* wrapper_info) {
         if (!val->IsObject())
