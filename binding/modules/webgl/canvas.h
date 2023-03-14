@@ -5,7 +5,6 @@
 #include "binding/modules/webgl/webgl_rendering_context.h"
 #include "core/arguments.h"
 #include "core/function_template_builder.h"
-#include "core/wrappable.h"
 #include "core/converter.h"
 #include "core/v8_object.h"
 #include "v8-template.h"

@@ -125,7 +125,7 @@ struct Converter<T*,
     if (val == nullptr)
       return v8::Null(isolate);
     
-         v8::Local<v8::Object> instance = val->GetV8Object();
+    v8::Local<v8::Object> instance = val->GetV8Object();
     return v8::MaybeLocal<v8::Value>(instance);
   }
 

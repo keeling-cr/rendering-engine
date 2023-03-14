@@ -3,12 +3,11 @@
 
 
 #include "core/arguments.h"
-#include "core/wrappable.h"
 #include "core/function_template_builder.h"
 #include "core/converter.h"
 #include "core/typed_array/array_buffer.h"
 #include "core/v8_object.h"
-
+#include "core/script_value.h"
 #include "angle/gles_loader_autogen.h"
 
 namespace bind {
@@ -16,6 +15,7 @@ namespace bind {
 class WebGLBuffer;
 class WebGLShader;
 class WebGLProgram;
+class WebGLTexture;
 class WebGLObjectInterface;
 
 class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
@@ -46,10 +46,16 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void AttachShader(WebGLProgram* program, WebGLShader* shader);
 
     GLint GetAttribLocation(WebGLProgram* program, const std::string& name);
-
     void VertexAttribPointer(
       GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLintptr offset);
     void EnableVertexAttribArray(GLuint index);
+
+    void ActiveTexture(GLenum texture);
+    void BindTexture(GLenum target, WebGLTexture* texture);
+    WebGLTexture* CreateTexture();
+    void DeleteTexture(WebGLTexture* texture);
+    nica::ScriptValue GetTexParameter(GLenum target, GLenum pname);
+    GLboolean IsTexture(WebGLTexture* texture);
 
     void Clear(GLbitfield mask);
     void Enable(GLenum cap);
@@ -57,10 +63,17 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void DrawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset);
     void DrawArrays(GLenum mode, GLint first, GLsizei count);
   private:
+    bool ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums);
     bool ValidateCapability(const char* function, GLenum cap);
     bool ValidateObject(WebGLObjectInterface* object);
     bool ValidateBufferDataParameters(const char* function, GLenum target, GLenum usage);
     bool RequireObject(const void* object);
+
+
+    void DeleteBufferInMap(WebGLBuffer* buffer);
+    void DeleteShaderInMap(WebGLShader* shader);
+    void DeleteProgramInMap(WebGLShader* program);
+    void DeleteTextureInMap(WebGLTexture* texture);
 
     template<class T>
     void DeleteMapObjects(std::map<GLuint, T*>& map) {
@@ -77,6 +90,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     std::map<GLuint, WebGLBuffer*> buffer_map_;
     std::map<GLuint, WebGLShader*> shader_map_;
     std::map<GLuint, WebGLProgram*> program_map_;
+    std::map<GLuint, WebGLTexture*> texture_map_;
 };
 
 } // namespace bind

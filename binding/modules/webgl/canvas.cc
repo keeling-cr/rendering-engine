@@ -78,7 +78,6 @@ Canvas::Canvas(
 
 Canvas::~Canvas() = default;
 
-
 WebGLRenderingContext* Canvas::GetContext() {
     if (!webgl_rendering_context_) {
         webgl_rendering_context_ = 

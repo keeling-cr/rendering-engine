@@ -6,6 +6,8 @@
 #include "binding/modules/webgl/webgl_object.h"
 #include "binding/modules/webgl/webgl_shader.h"
 #include "binding/modules/webgl/webgl_program.h"
+#include "binding/modules/webgl/webgl_texture.h"
+#include "binding/modules/webgl/webgl_any.h"
 #include "base/logging.h"
 
 namespace bind {
@@ -25,6 +27,7 @@ WebGLRenderingContext::~WebGLRenderingContext() {
     DeleteMapObjects(buffer_map_);
     DeleteMapObjects(shader_map_);
     DeleteMapObjects(program_map_);
+    DeleteMapObjects(texture_map_);
 }
 
 void WebGLRenderingContext::ClearColor(
@@ -245,6 +248,49 @@ bool WebGLRenderingContext::ValidateCapability(const char* function, GLenum cap)
 
 }
 
+void WebGLRenderingContext::DeleteBufferInMap(WebGLBuffer* buffer) {
+    if (!buffer) return;
+    buffer_map_.erase(buffer->webgl_id());
+    delete buffer;
+}
+
+void WebGLRenderingContext::DeleteShaderInMap(WebGLShader* shader) {
+    if (!shader) return;
+    shader_map_.erase(shader->webgl_id());
+    delete shader;
+}
+
+void WebGLRenderingContext::DeleteProgramInMap(WebGLShader* program) {
+    if (!program) return;
+    program_map_.erase(program->webgl_id());
+    delete program;
+}
+
+void WebGLRenderingContext::DeleteTextureInMap(WebGLTexture* texture) {
+    if (!texture) return;
+    texture_map_.erase(texture->webgl_id());
+    delete texture;
+}
+
+bool WebGLRenderingContext::ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums) {
+  switch (target) {
+    case GL_TEXTURE_2D:
+      break;
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+      if (use_six_enums)
+        break;
+    default:
+      set_gl_error(GL_INVALID_ENUM);
+      return false;
+  }
+  return true;
+}
+
 bool WebGLRenderingContext::ValidateObject(WebGLObjectInterface* object) {
     if (object && !object->ValidateContext(this)) {
         set_gl_error(GL_INVALID_OPERATION);
@@ -316,6 +362,70 @@ void WebGLRenderingContext::Clear(GLbitfield mask) {
     glClear(mask);
 }
 
+void WebGLRenderingContext::ActiveTexture(GLenum texture) {
+    glActiveTexture(texture);
+}
+
+void WebGLRenderingContext::BindTexture(GLenum target, WebGLTexture* texture) {
+    switch (target) {
+        case GL_TEXTURE_2D:
+        case GL_TEXTURE_CUBE_MAP:
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return;
+    }
+    
+    if (!ValidateObject(texture)) return;
+    GLuint texture_id = texture ? texture->webgl_id() : 0;
+    glBindTexture(target, texture_id);    
+}
+
+WebGLTexture* WebGLRenderingContext::CreateTexture() {
+    GLuint texture_id = 0;
+    glGenTextures(1, &texture_id);
+    WebGLTexture* texture = new WebGLTexture(GetIsolate(), this, texture_id);
+    texture_map_[texture_id] = texture;
+    return texture;
+}
+
+void WebGLRenderingContext::DeleteTexture(WebGLTexture* texture) {
+    if (!ValidateObject(texture)) 
+        return;
+    
+    GLuint texture_id = texture ? texture->webgl_id() : 0;
+    glDeleteTextures(1, &texture_id);
+    DeleteTextureInMap(texture);
+    return;
+}
+
+nica::ScriptValue WebGLRenderingContext::GetTexParameter(GLenum target, GLenum pname) {
+    if (!ValidateTextureBinding("getTextParameter", target, false))
+        return nica::ScriptValue::CreateNull(GetIsolate());
+    switch (pname) {
+        case GL_TEXTURE_MAG_FILTER:
+        case GL_TEXTURE_MIN_FILTER:
+        case GL_TEXTURE_WRAP_S:
+        case GL_TEXTURE_WRAP_T:
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return nica::ScriptValue::CreateNull(GetIsolate());
+    }
+    GLint value = 0;
+    glGetTexParameteriv(target, pname, &value);
+    return WebGLAny(GetIsolate(), value);
+}
+
+GLboolean WebGLRenderingContext::IsTexture(WebGLTexture* texture) {
+    if (!texture)
+        return false;
+
+    GLuint texture_id = texture ? texture->webgl_id() : 0;
+    return glIsTexture(texture_id);
+}
+
+
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
@@ -339,6 +449,12 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("createBuffer", &WebGLRenderingContext::CreateBuffer);    
     builder.SetMethod("bindBuffer", &WebGLRenderingContext::BindBuffer);
     builder.SetMethod("clearColor", &WebGLRenderingContext::ClearColor);
+    builder.SetMethod("activeTexture", &WebGLRenderingContext::ActiveTexture);
+    builder.SetMethod("bindTexture", &WebGLRenderingContext::BindTexture);
+    builder.SetMethod("createTexture", &WebGLRenderingContext::CreateTexture);
+    builder.SetMethod("GetTexParameter", &WebGLRenderingContext::GetTexParameter);
+    builder.SetMethod("deleteTexture", &WebGLRenderingContext::DeleteTexture);
+    builder.SetMethod("isTexture", &WebGLRenderingContext::IsTexture);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    
