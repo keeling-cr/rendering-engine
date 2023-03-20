@@ -33,11 +33,6 @@ WebGLRenderingContext::~WebGLRenderingContext() {
     DeleteMapObjects(renderbuffer_map_);
 }
 
-void WebGLRenderingContext::ClearColor(
-    float read, float green, float blue, float alpha) {
-    glClearColor(read, green, blue, alpha);
-}
-
 WebGLBuffer* WebGLRenderingContext::CreateBuffer() {
     GLuint buffer_id = 0;
     glGenBuffers(1, &buffer_id);
@@ -418,6 +413,18 @@ void WebGLRenderingContext::Clear(GLbitfield mask) {
     glClear(mask);
 }
 
+void WebGLRenderingContext::ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
+    glClearColor(red, green, blue, alpha);
+}
+
+void WebGLRenderingContext::ClearDepth(GLclampf depth) {
+    glClearDepthf(depth);
+}
+
+void WebGLRenderingContext::ClearStencil(GLint s) {
+    glClearStencil(s);
+}
+
 void WebGLRenderingContext::ActiveTexture(GLenum texture) {
     glActiveTexture(texture);
 }
@@ -688,7 +695,6 @@ nica::FunctionTemplateBuilder
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
     nica::FunctionTemplateBuilder builder(isolate, nullptr);
-    builder.SetMethod("clear", &WebGLRenderingContext::Clear);
     builder.SetMethod("drawElements", &WebGLRenderingContext::DrawElements);
     builder.SetMethod("drawArrays", &WebGLRenderingContext::DrawArrays);
     builder.SetMethod("viewport", &WebGLRenderingContext::Viewport);
@@ -706,7 +712,10 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("linkProgram", &WebGLRenderingContext::LinkProgram);
     builder.SetMethod("createBuffer", &WebGLRenderingContext::CreateBuffer);    
     builder.SetMethod("bindBuffer", &WebGLRenderingContext::BindBuffer);
+    builder.SetMethod("clear", &WebGLRenderingContext::Clear);
     builder.SetMethod("clearColor", &WebGLRenderingContext::ClearColor);
+    builder.SetMethod("clearDepth", &WebGLRenderingContext::ClearDepth);
+    builder.SetMethod("clearStencil", &WebGLRenderingContext::ClearStencil);
     builder.SetMethod("activeTexture", &WebGLRenderingContext::ActiveTexture);
     builder.SetMethod("bindTexture", &WebGLRenderingContext::BindTexture);
     builder.SetMethod("createTexture", &WebGLRenderingContext::CreateTexture);

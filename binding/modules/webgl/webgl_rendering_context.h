@@ -35,7 +35,6 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     unsigned long context_id() { return context_id_; }
 
     void BufferData(GLenum target, nica::ArrayBufferView* buffer, GLenum usage);
-    void ClearColor(float read, float green, float blue, float alpha);
     WebGLBuffer* CreateBuffer();
     void BindBuffer(GLenum target, WebGLBuffer* buffer);
     WebGLShader* CreateShader(GLenum type);
@@ -86,6 +85,10 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass);
 
     void Clear(GLbitfield mask);
+    void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+    void ClearDepth(GLclampf depth);
+    void ClearStencil(GLint s);
+    
     void Enable(GLenum cap);
     void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
     void DrawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset);
