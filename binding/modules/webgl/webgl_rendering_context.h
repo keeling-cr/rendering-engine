@@ -78,13 +78,20 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void BlendFunc(GLenum sfactor, GLenum dfactor);
     void BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha);
 
+    void StencilFunc(GLenum func, GLint ref, GLuint mask);
+    void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask);
+    void StencilMask(GLuint mask);
+    void StencilMaskSeparate(GLenum face, GLuint mask);
+    void StencilOp(GLenum fail, GLenum zfail, GLenum zpass);
+    void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass);
+
     void Clear(GLbitfield mask);
     void Enable(GLenum cap);
     void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
     void DrawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset);
     void DrawArrays(GLenum mode, GLint first, GLsizei count);
   private:
-
+    bool ValidateStencilFunc(const char* function, GLenum func);
     bool ValidateBlendFuncFactors(const char* function, GLenum src, GLenum dst);
     bool ValidateBlendEquation(const char* function, GLenum mode);
     bool ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums);

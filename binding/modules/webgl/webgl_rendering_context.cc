@@ -306,6 +306,23 @@ bool WebGLRenderingContext::ValidateTextureBinding(const char* function, GLenum 
   return true;
 }
 
+bool WebGLRenderingContext::ValidateStencilFunc(const char* function, GLenum func) {
+    switch (func) {
+        case GL_NEVER:
+        case GL_LESS:
+        case GL_LEQUAL:
+        case GL_GREATER:
+        case GL_GEQUAL:
+        case GL_EQUAL:
+        case GL_NOTEQUAL:
+        case GL_ALWAYS:
+            return true;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return false;
+    }
+}
+
 bool WebGLRenderingContext::ValidateBlendFuncFactors(const char* function, GLenum src, GLenum dst) {
   if (((src == GL_CONSTANT_COLOR || src == GL_ONE_MINUS_CONSTANT_COLOR)
        && (dst == GL_CONSTANT_ALPHA || dst == GL_ONE_MINUS_CONSTANT_ALPHA))
@@ -619,6 +636,54 @@ void WebGLRenderingContext::BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLen
     glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 }
 
+void WebGLRenderingContext::StencilFunc(GLenum func, GLint ref, GLuint mask) {
+    if (!ValidateStencilFunc("stencilFunc", func))
+        return;
+    glStencilFunc(func, ref, mask);
+}
+
+void WebGLRenderingContext::StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask) {
+    switch (face) {
+        case GL_FRONT_AND_BACK:
+        case GL_FRONT:
+        case GL_BACK:
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return;
+  }
+
+  if (!ValidateStencilFunc("stencilFuncSeparate", func))
+    return;
+
+  glStencilFuncSeparate(face, func, ref, mask);
+}
+
+void WebGLRenderingContext::StencilMask(GLuint mask) {
+    glStencilMask(mask);
+}
+
+void WebGLRenderingContext::StencilMaskSeparate(GLenum face, GLuint mask) {
+    switch (face) {
+        case GL_FRONT_AND_BACK:
+        case GL_FRONT:
+        case GL_BACK:
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return;
+    }
+    glStencilMaskSeparate(face, mask);
+}
+
+void WebGLRenderingContext::StencilOp(GLenum fail, GLenum zfail, GLenum zpass) {
+    glStencilOp(fail, zfail, zpass);
+}
+
+void WebGLRenderingContext::StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass) {
+    glStencilOpSeparate(face, fail, zfail, zpass);
+}
+
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
@@ -661,6 +726,12 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("blendEquationSeparate", &WebGLRenderingContext::BlendEquationSeparate);
     builder.SetMethod("blendFunc", &WebGLRenderingContext::BlendFunc);
     builder.SetMethod("blendFuncSeparate", &WebGLRenderingContext::BlendFuncSeparate);
+    builder.SetMethod("stencilFunc", &WebGLRenderingContext::StencilFunc);
+    builder.SetMethod("stencilFuncSeparate", &WebGLRenderingContext::StencilFuncSeparate);
+    builder.SetMethod("stencilMask", &WebGLRenderingContext::StencilMask);
+    builder.SetMethod("stencilMaskSeparate", &WebGLRenderingContext::StencilMaskSeparate);
+    builder.SetMethod("stencilOp", &WebGLRenderingContext::StencilOp);
+    builder.SetMethod("stencilOpSeparate", &WebGLRenderingContext::StencilOpSeparate);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    
