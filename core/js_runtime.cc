@@ -12,6 +12,7 @@
 #include "binding/modules/webgl/canvas.h"
 #include "binding/modules/webgl/webgl_rendering_context.h"
 #include "binding/modules/webgl/webgl_buffer.h"
+#include "binding/modules/webgl/webgl_renderbuffer.h"
 #include "binding/modules/webgl/webgl_shader.h"
 #include "binding/modules/webgl/webgl_program.h"
 
@@ -65,6 +66,7 @@ void JSRuntime::InstallBuiltinModule() {
     REGISTER(WebGLBuffer);
     REGISTER(WebGLShader);
     REGISTER(WebGLProgram);
+    REGISTER(WebGLRenderbuffer);
 #undef REGISTER
 }
     

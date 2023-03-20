@@ -5,6 +5,7 @@ set(BIND_SOURCE
     modules/webgl/webgl_buffer.cc
     modules/webgl/webgl_program.cc
     modules/webgl/webgl_rendering_context.cc
+    modules/webgl/webgl_renderbuffer.cc
     modules/webgl/webgl_shader.cc
     modules/webgl/webgl_texture.cc)
 

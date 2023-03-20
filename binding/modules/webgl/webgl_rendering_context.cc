@@ -7,6 +7,7 @@
 #include "binding/modules/webgl/webgl_shader.h"
 #include "binding/modules/webgl/webgl_program.h"
 #include "binding/modules/webgl/webgl_texture.h"
+#include "binding/modules/webgl/webgl_renderbuffer.h"
 #include "binding/modules/webgl/webgl_any.h"
 #include "base/logging.h"
 
@@ -28,6 +29,7 @@ WebGLRenderingContext::~WebGLRenderingContext() {
     DeleteMapObjects(shader_map_);
     DeleteMapObjects(program_map_);
     DeleteMapObjects(texture_map_);
+    DeleteMapObjects(renderbuffer_map_);
 }
 
 void WebGLRenderingContext::ClearColor(
@@ -272,6 +274,12 @@ void WebGLRenderingContext::DeleteTextureInMap(WebGLTexture* texture) {
     delete texture;
 }
 
+void WebGLRenderingContext::DeleteRenderbufferInMap(WebGLRenderbuffer* renderbuffer) {
+    if (!renderbuffer) return;
+    renderbuffer_map_.erase(renderbuffer->webgl_id());
+    delete renderbuffer;
+}
+
 bool WebGLRenderingContext::ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums) {
   switch (target) {
     case GL_TEXTURE_2D:
@@ -425,6 +433,92 @@ GLboolean WebGLRenderingContext::IsTexture(WebGLTexture* texture) {
     return glIsTexture(texture_id);
 }
 
+WebGLRenderbuffer* WebGLRenderingContext::CreateRenderbuffer() {
+    GLuint renderbuffer_id = 0;
+    glGenRenderbuffers(1, &renderbuffer_id);
+    WebGLRenderbuffer* renderbuffer = new WebGLRenderbuffer(GetIsolate(), this, renderbuffer_id);
+    renderbuffer_map_[renderbuffer_id] = renderbuffer;
+    return renderbuffer;
+}
+
+void WebGLRenderingContext::BindRenderbuffer(GLenum target, WebGLRenderbuffer* renderbuffer) {
+  if (target != GL_RENDERBUFFER) {
+    set_gl_error(GL_INVALID_ENUM);
+    return;
+  }
+  if (!ValidateObject(renderbuffer)) return;
+  GLuint renderbuffer_id = renderbuffer ? renderbuffer->webgl_id() : 0;
+  glBindRenderbuffer(target, renderbuffer_id);
+}
+
+void WebGLRenderingContext::DeleteRenderbuffer(WebGLRenderbuffer* renderbuffer) {
+    if (!ValidateObject(renderbuffer)) 
+        return;
+    
+    GLuint render_buffer_id = renderbuffer ? renderbuffer->webgl_id() : 0;
+    glDeleteRenderbuffers(1, &render_buffer_id);
+    DeleteRenderbufferInMap(renderbuffer);
+}
+
+nica::ScriptValue WebGLRenderingContext::GetRenderbufferParameter(GLenum target, GLenum pname) {
+    if (target != GL_RENDERBUFFER) {
+        set_gl_error(GL_INVALID_ENUM);
+        return nica::ScriptValue::CreateNull(GetIsolate());
+    }
+    GLint value = 0;
+    glGetRenderbufferParameteriv(target, pname, &value);
+    switch (pname) {
+        case GL_RENDERBUFFER_INTERNAL_FORMAT:
+            return WebGLAny(GetIsolate(), static_cast<uint32_t>(value));
+        case GL_RENDERBUFFER_WIDTH:
+        case GL_RENDERBUFFER_HEIGHT:
+        case GL_RENDERBUFFER_RED_SIZE:
+        case GL_RENDERBUFFER_GREEN_SIZE:
+        case GL_RENDERBUFFER_BLUE_SIZE:
+        case GL_RENDERBUFFER_ALPHA_SIZE:
+        case GL_RENDERBUFFER_DEPTH_SIZE:
+        case GL_RENDERBUFFER_STENCIL_SIZE:
+            return WebGLAny(GetIsolate(), value);
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return nica::ScriptValue::CreateNull(GetIsolate());
+    }
+}
+
+bool WebGLRenderingContext::IsRenderbuffer(WebGLRenderbuffer* renderbuffer) {
+  if (!renderbuffer)
+    return false;
+  GLuint renderbuffer_id = renderbuffer ? renderbuffer->webgl_id() : 0;
+  return glIsRenderbuffer(renderbuffer_id);
+}
+
+void WebGLRenderingContext::RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) {
+    if (target != GL_RENDERBUFFER) {
+        set_gl_error(GL_INVALID_ENUM);
+        return;
+    }
+    switch (internalformat) {
+        case GL_DEPTH_STENCIL:
+            internalformat = GL_DEPTH24_STENCIL8;
+            break;
+        case GL_DEPTH_COMPONENT16:
+            internalformat = GL_DEPTH_COMPONENT;
+            break;
+        case GL_RGBA4:
+        case GL_RGB5_A1:
+            internalformat = GL_RGBA;
+            break;
+        case GL_RGB565:
+            internalformat = GL_RGB;
+            break;
+        case GL_STENCIL_INDEX8:
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return;
+    }
+    glRenderbufferStorage(target, internalformat, width, height);
+}
 
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
@@ -455,6 +549,11 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("GetTexParameter", &WebGLRenderingContext::GetTexParameter);
     builder.SetMethod("deleteTexture", &WebGLRenderingContext::DeleteTexture);
     builder.SetMethod("isTexture", &WebGLRenderingContext::IsTexture);
+    builder.SetMethod("bindRenderbuffer", &WebGLRenderingContext::BindRenderbuffer);
+    builder.SetMethod("deleteRenderbuffer", &WebGLRenderingContext::DeleteRenderbuffer);
+    builder.SetMethod("getRenderbufferParameter", &WebGLRenderingContext::GetRenderbufferParameter);
+    builder.SetMethod("isRenderbuffer", &WebGLRenderingContext::IsRenderbuffer);
+    builder.SetMethod("renderbufferStorage", &WebGLRenderingContext::RenderbufferStorage);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    

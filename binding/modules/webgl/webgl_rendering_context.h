@@ -15,6 +15,7 @@ namespace bind {
 class WebGLBuffer;
 class WebGLShader;
 class WebGLProgram;
+class WebGLRenderbuffer;
 class WebGLTexture;
 class WebGLObjectInterface;
 
@@ -57,6 +58,12 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     nica::ScriptValue GetTexParameter(GLenum target, GLenum pname);
     GLboolean IsTexture(WebGLTexture* texture);
 
+    void BindRenderbuffer(GLenum target, WebGLRenderbuffer* renderbuffer);
+    WebGLRenderbuffer* CreateRenderbuffer();
+    void DeleteRenderbuffer(WebGLRenderbuffer* renderbuffer);
+    nica::ScriptValue GetRenderbufferParameter(GLenum target, GLenum pname);
+    bool IsRenderbuffer(WebGLRenderbuffer* renderbuffer);
+    void RenderbufferStorage(GLenum target, GLenum internalFormat, GLsizei width, GLsizei height);
     void Clear(GLbitfield mask);
     void Enable(GLenum cap);
     void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
@@ -74,6 +81,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void DeleteShaderInMap(WebGLShader* shader);
     void DeleteProgramInMap(WebGLShader* program);
     void DeleteTextureInMap(WebGLTexture* texture);
+    void DeleteRenderbufferInMap(WebGLRenderbuffer* renderbuffer);
 
     template<class T>
     void DeleteMapObjects(std::map<GLuint, T*>& map) {
@@ -91,6 +99,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     std::map<GLuint, WebGLShader*> shader_map_;
     std::map<GLuint, WebGLProgram*> program_map_;
     std::map<GLuint, WebGLTexture*> texture_map_;
+    std::map<GLuint, WebGLRenderbuffer*> renderbuffer_map_;
 };
 
 } // namespace bind
