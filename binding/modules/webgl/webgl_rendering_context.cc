@@ -7,6 +7,7 @@
 #include "binding/modules/webgl/webgl_shader.h"
 #include "binding/modules/webgl/webgl_program.h"
 #include "binding/modules/webgl/webgl_texture.h"
+#include "binding/modules/webgl/webgl_framebuffer.h"
 #include "binding/modules/webgl/webgl_renderbuffer.h"
 #include "binding/modules/webgl/webgl_any.h"
 #include "base/logging.h"
@@ -280,6 +281,12 @@ void WebGLRenderingContext::DeleteRenderbufferInMap(WebGLRenderbuffer* renderbuf
     delete renderbuffer;
 }
 
+void WebGLRenderingContext::DeleteFramebufferInMap(WebGLFramebuffer* framebuffer) {
+    if (!framebuffer) return;
+    framebuffer_map_.erase(framebuffer->webgl_id());
+    delete framebuffer;
+}
+
 bool WebGLRenderingContext::ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums) {
   switch (target) {
     case GL_TEXTURE_2D:
@@ -520,6 +527,44 @@ void WebGLRenderingContext::RenderbufferStorage(GLenum target, GLenum internalfo
     glRenderbufferStorage(target, internalformat, width, height);
 }
 
+void WebGLRenderingContext::BindFramebuffer(GLenum target, WebGLFramebuffer* framebuffer) {
+    if (target != GL_FRAMEBUFFER) {
+        set_gl_error(GL_INVALID_ENUM);
+        return;
+    }
+    if (!ValidateObject(framebuffer)) return;
+
+    GLuint framebuffer_id = framebuffer ? framebuffer->webgl_id() : 0;
+    glBindFramebuffer(target, framebuffer_id);
+}
+
+GLenum WebGLRenderingContext::CheckFramebufferStatus(GLenum target) {
+    if (target != GL_FRAMEBUFFER) {
+        set_gl_error(GL_INVALID_ENUM);
+        return static_cast<uint32_t>(0);
+    }
+    return glCheckFramebufferStatus(target);
+}
+
+WebGLFramebuffer* WebGLRenderingContext::CreateFramebuffer() {
+    GLuint framebuffer_id = 0;
+    glGenFramebuffers(1, &framebuffer_id);
+    WebGLFramebuffer* framebuffer = new WebGLFramebuffer(GetIsolate(), this, framebuffer_id);
+    framebuffer_map_[framebuffer_id] = framebuffer;
+    return framebuffer;
+}
+
+void WebGLRenderingContext::DeleteFramebuffer(WebGLFramebuffer* framebuffer) {
+    if (!ValidateObject(framebuffer)) return;
+    GLuint framebuffer_id = framebuffer ? framebuffer->webgl_id() : 0;
+    glDeleteFramebuffers(1, &framebuffer_id);
+    DeleteFramebufferInMap(framebuffer);
+}
+
+// nica::ScriptValue GetFramebufferAttachmentParameter(GLenum target, GLenum attachment, GLenum pname) {
+
+// }
+
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
@@ -553,7 +598,10 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("deleteRenderbuffer", &WebGLRenderingContext::DeleteRenderbuffer);
     builder.SetMethod("getRenderbufferParameter", &WebGLRenderingContext::GetRenderbufferParameter);
     builder.SetMethod("isRenderbuffer", &WebGLRenderingContext::IsRenderbuffer);
-    builder.SetMethod("renderbufferStorage", &WebGLRenderingContext::RenderbufferStorage);
+    builder.SetMethod("bindFramebuffer", &WebGLRenderingContext::BindFramebuffer);
+    builder.SetMethod("checkFramebufferStatus", &WebGLRenderingContext::CheckFramebufferStatus);
+    builder.SetMethod("createFramebuffer", &WebGLRenderingContext::CreateFramebuffer);
+    builder.SetMethod("deleteFramebuffer", &WebGLRenderingContext::DeleteFramebuffer);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    

@@ -3,6 +3,7 @@ set(BIND_SOURCE
     modules/webgl/canvas.cc
     modules/webgl/webgl_any.cc
     modules/webgl/webgl_buffer.cc
+    modules/webgl/webgl_framebuffer.cc
     modules/webgl/webgl_program.cc
     modules/webgl/webgl_rendering_context.cc
     modules/webgl/webgl_renderbuffer.cc
