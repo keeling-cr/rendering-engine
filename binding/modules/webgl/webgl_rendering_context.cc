@@ -306,6 +306,30 @@ bool WebGLRenderingContext::ValidateTextureBinding(const char* function, GLenum 
   return true;
 }
 
+bool WebGLRenderingContext::ValidateBlendFuncFactors(const char* function, GLenum src, GLenum dst) {
+  if (((src == GL_CONSTANT_COLOR || src == GL_ONE_MINUS_CONSTANT_COLOR)
+       && (dst == GL_CONSTANT_ALPHA || dst == GL_ONE_MINUS_CONSTANT_ALPHA))
+      || ((dst == GL_CONSTANT_COLOR || dst == GL_ONE_MINUS_CONSTANT_COLOR)
+          && (src == GL_CONSTANT_ALPHA || src == GL_ONE_MINUS_CONSTANT_ALPHA))) {
+    set_gl_error(GL_INVALID_OPERATION);
+    return false;
+  }
+  return true;
+}
+
+bool WebGLRenderingContext::ValidateBlendEquation(const char* function, GLenum mode) {
+  switch (mode) {
+    case GL_FUNC_ADD:
+    case GL_FUNC_SUBTRACT:
+    case GL_FUNC_REVERSE_SUBTRACT:
+      return true;
+    default:
+      set_gl_error(GL_INVALID_ENUM);
+      return false;
+  }
+}
+
+
 bool WebGLRenderingContext::ValidateObject(WebGLObjectInterface* object) {
     if (object && !object->ValidateContext(this)) {
         set_gl_error(GL_INVALID_OPERATION);
@@ -565,6 +589,36 @@ void WebGLRenderingContext::DeleteFramebuffer(WebGLFramebuffer* framebuffer) {
 
 // }
 
+void WebGLRenderingContext::BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
+    glBlendColor(red, green, blue, alpha);
+}
+
+void WebGLRenderingContext::BlendEquation(GLenum mode) {
+    glBlendEquation(mode);
+}
+
+void WebGLRenderingContext::BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha) {
+    if (!ValidateBlendEquation("blendEquationSeparate", modeRGB))
+        return;
+    
+    if (!ValidateBlendEquation("blendEquationSeparate", modeAlpha))
+        return;
+    glBlendEquationSeparate(modeRGB, modeAlpha);
+}
+
+void WebGLRenderingContext::BlendFunc(GLenum sfactor, GLenum dfactor) {
+    if (!ValidateBlendFuncFactors("blendFunc", sfactor, dfactor))
+        return;
+    glBlendFunc(sfactor, dfactor);
+    return;
+}
+
+void WebGLRenderingContext::BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) {
+    if (!ValidateBlendFuncFactors("blendFuncSeparate", srcRGB, dstRGB))
+        return;
+    glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+}
+
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
@@ -602,6 +656,11 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("checkFramebufferStatus", &WebGLRenderingContext::CheckFramebufferStatus);
     builder.SetMethod("createFramebuffer", &WebGLRenderingContext::CreateFramebuffer);
     builder.SetMethod("deleteFramebuffer", &WebGLRenderingContext::DeleteFramebuffer);
+    builder.SetMethod("blendColor", &WebGLRenderingContext::BlendColor);
+    builder.SetMethod("blendEquation", &WebGLRenderingContext::BlendEquation);
+    builder.SetMethod("blendEquationSeparate", &WebGLRenderingContext::BlendEquationSeparate);
+    builder.SetMethod("blendFunc", &WebGLRenderingContext::BlendFunc);
+    builder.SetMethod("blendFuncSeparate", &WebGLRenderingContext::BlendFuncSeparate);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    

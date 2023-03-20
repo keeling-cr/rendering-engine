@@ -72,18 +72,26 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void DeleteFramebuffer(WebGLFramebuffer* framebuffer);
     // nica::ScriptValue GetFramebufferAttachmentParameter(GLenum target, GLenum attachment, GLenum pname);
 
+    void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+    void BlendEquation(GLenum mode);
+    void BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha);
+    void BlendFunc(GLenum sfactor, GLenum dfactor);
+    void BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha);
+
     void Clear(GLbitfield mask);
     void Enable(GLenum cap);
     void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
     void DrawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset);
     void DrawArrays(GLenum mode, GLint first, GLsizei count);
   private:
+
+    bool ValidateBlendFuncFactors(const char* function, GLenum src, GLenum dst);
+    bool ValidateBlendEquation(const char* function, GLenum mode);
     bool ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums);
     bool ValidateCapability(const char* function, GLenum cap);
     bool ValidateObject(WebGLObjectInterface* object);
     bool ValidateBufferDataParameters(const char* function, GLenum target, GLenum usage);
     bool RequireObject(const void* object);
-
 
     void DeleteBufferInMap(WebGLBuffer* buffer);
     void DeleteShaderInMap(WebGLShader* shader);
