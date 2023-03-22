@@ -84,6 +84,14 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     void StencilOp(GLenum fail, GLenum zfail, GLenum zpass);
     void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass);
 
+    void CopyTexImage2D(
+      GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border);
+    void CopyTexSubImage2D(
+      GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+    void TexImage2D(const v8::FunctionCallbackInfo<v8::Value>* info);
+    void TexSubImage2D(const v8::FunctionCallbackInfo<v8::Value>* info);
+
+
     void Clear(GLbitfield mask);
     void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
     void ClearDepth(GLclampf depth);

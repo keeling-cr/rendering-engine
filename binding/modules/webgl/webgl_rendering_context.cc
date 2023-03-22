@@ -691,6 +691,44 @@ void WebGLRenderingContext::StencilOpSeparate(GLenum face, GLenum fail, GLenum z
     glStencilOpSeparate(face, fail, zfail, zpass);
 }
 
+// void texImage2D(GLenum target, GLint level, GLenum internalformat, 
+//                 GLsizei width, GLsizei height, GLint border, GLenum format, 
+//                 GLenum type, ArrayBufferView pixels);
+// void texImage2D(GLenum target, GLint level, GLenum internalformat,
+//                 GLenum format, GLenum type, ImageData pixels);
+// void texImage2D(GLenum target, GLint level, GLenum internalformat,
+//                 GLenum format, GLenum type, HTMLImageElement image) raises (DOMException);
+// void texImage2D(GLenum target, GLint level, GLenum internalformat,
+//                 GLenum format, GLenum type, HTMLCanvasElement canvas) raises (DOMException);
+// void texImage2D(GLenum target, GLint level, GLenum internalformat,
+//                 GLenum format, GLenum type, HTMLVideoElement video) raises (DOMException);
+void WebGLRenderingContext::TexImage2D(
+    const v8::FunctionCallbackInfo<v8::Value>* info) {
+}
+
+// // WebGL1
+// texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels) // pixels is a TypedArray or a DataView
+// texSubImage2D(target, level, xoffset, yoffset, format, type, pixels)
+// // WebGL2
+// texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, offset)
+// texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, source)
+// texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels, srcOffset)
+void WebGLRenderingContext::TexSubImage2D(
+    const v8::FunctionCallbackInfo<v8::Value>* info) {
+}
+
+void WebGLRenderingContext::CopyTexImage2D(
+    GLenum target, GLint level, GLenum internalformat, 
+    GLint x, GLint y, GLsizei width, GLsizei height, GLint border) {
+    glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
+}
+
+void WebGLRenderingContext::CopyTexSubImage2D(
+    GLenum target, GLint level, GLint xoffset, GLint yoffset,
+    GLint x, GLint y, GLsizei width, GLsizei height) {
+    glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+}
+
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
@@ -741,6 +779,10 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("stencilMaskSeparate", &WebGLRenderingContext::StencilMaskSeparate);
     builder.SetMethod("stencilOp", &WebGLRenderingContext::StencilOp);
     builder.SetMethod("stencilOpSeparate", &WebGLRenderingContext::StencilOpSeparate);
+    builder.SetMethod("copyTexImage2D", &WebGLRenderingContext::CopyTexImage2D);
+    builder.SetMethod("copyTexSubImage2D", &WebGLRenderingContext::CopyTexSubImage2D);
+    builder.SetMethod("texImage2D", &WebGLRenderingContext::TexImage2D);
+    builder.SetMethod("texSubImage2D", &WebGLRenderingContext::TexSubImage2D);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    
