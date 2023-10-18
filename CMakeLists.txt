@@ -52,7 +52,7 @@ set(V8_LIBS
     v8_libplatform.a
     v8_monolith.a)
 
-add_executable(${PROJECT_NAME} ${nica}/test.cc)
+add_executable(${PROJECT_NAME} ${nica}/main.cc)
 
 target_link_libraries(${PROJECT_NAME} 
     ${V8_LIBS}

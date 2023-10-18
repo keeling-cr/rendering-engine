@@ -19,7 +19,6 @@ const int kAngleStencilBits = 8;
 void CanvasNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
     v8::Isolate* isolate = args.GetIsolate();
     v8::HandleScope handle_scope(isolate);
-    LOG(ERROR) << "keiling " << __func__;
     if (!args.IsConstructCall()) {
         isolate->ThrowError("Canvas must be constructed with new");
         return;
@@ -67,12 +66,12 @@ Canvas::Canvas(
     config_params.stencil_bits = kAngleStencilBits;
 
     if (!egl_window_->InitializeGL(platform::GetPlatformWindow(), angle::AngleEGLLibrary(), config_params)) {
-        LOG(ERROR) << "keilingnica initialize gl error";
+        LOG(ERROR) << "Initialize gl error";
     }
 
     // Disable vsync
     if (!egl_window_->SetSwapInterval(0)) {
-        LOG(ERROR) << "keilingnica swap interval erro";
+        LOG(ERROR) << "Swap interval erro";
     }
 }
 
@@ -83,7 +82,6 @@ WebGLRenderingContext* Canvas::GetContext() {
         webgl_rendering_context_ = 
             std::unique_ptr<WebGLRenderingContext>(new WebGLRenderingContext(GetIsolate()));
     }
-    LOG(ERROR) << "keilingnica " << __func__;
     return webgl_rendering_context_.get();
 }
 
@@ -95,7 +93,6 @@ void Canvas::SwapBufferForTest() {
 nica::FunctionTemplateBuilder 
 Canvas::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
-    LOG(ERROR) << "keiling " << __func__;
     nica::FunctionTemplateBuilder builder(isolate, CanvasNew);
     builder.SetMethod("getContext", &Canvas::GetContext);
     builder.SetMethod("swapBufferForTest", &Canvas::SwapBufferForTest);

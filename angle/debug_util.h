@@ -101,7 +101,7 @@ void GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
         break;
     }
     //todo(liqining): sprintf this log
-    LOG(ERROR) << "keilingnica opengl error id " << id << " " << _type << " of " << _severity << " severity, raised from " << _source << " : " << msg;
+    LOG(ERROR) << "opengl error id " << id << " " << _type << " of " << _severity << " severity, raised from " << _source << " : " << msg;
 }
 
 } // namespace

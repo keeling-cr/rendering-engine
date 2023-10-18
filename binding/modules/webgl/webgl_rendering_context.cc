@@ -213,7 +213,7 @@ bool WebGLRenderingContext::ValidateBufferDataParameters(
         case GL_ARRAY_BUFFER:
             break;
         default:
-            LOG(ERROR) << "keilingnica " << function << " invalid target";
+            LOG(ERROR) << function << " invalid target";
             set_gl_error(GL_INVALID_ENUM);
             return false;
     }
@@ -224,7 +224,7 @@ bool WebGLRenderingContext::ValidateBufferDataParameters(
         case GL_DYNAMIC_DRAW:
             break;
         default:
-            LOG(ERROR) << "keilingnica " << function << " invalid usage. ";
+            LOG(ERROR) <<  function << " invalid usage. ";
             set_gl_error(GL_INVALID_ENUM);
             return false;
     }
@@ -244,7 +244,7 @@ bool WebGLRenderingContext::ValidateCapability(const char* function, GLenum cap)
         case GL_STENCIL_TEST:
             return true;
         default:
-            LOG(ERROR) << "keilingnica " << function << " invalid capability.";
+            LOG(ERROR) << function << " invalid capability.";
             set_gl_error(GL_INVALID_ENUM);
             return false;
     }
@@ -392,22 +392,20 @@ void WebGLRenderingContext::Enable(GLenum cap) {
 
 void WebGLRenderingContext::Viewport(
     GLint x, GLint y, GLsizei width, GLsizei height) {
-    LOG(ERROR) << "keilingnica Viewport width " << width;
-    LOG(ERROR) << "keilingnica Viewport height " << height;
     glViewport(x, y, width, height);
 }
 
 void WebGLRenderingContext::DrawElements(
     GLenum mode, GLsizei count, GLenum type, GLintptr offset) {
     glDrawElements(mode, count, type, reinterpret_cast<GLvoid*>(static_cast<intptr_t>(offset)));
-    LOG(ERROR) << "keilingnica gl error " << glGetError() << " " << __func__;
+    LOG(ERROR) << "GL error " << glGetError() << " " << __func__;
     //todo(liqining): remove it, it should be triggered by vsync
 }
 
 void WebGLRenderingContext::DrawArrays(
     GLenum mode, GLint first, GLsizei count) {
     glDrawArrays(mode, first, count);
-    LOG(ERROR) << "keilingnica gl error " << glGetError() << " " << __func__;
+    LOG(ERROR) << "GL error " << glGetError() << " " << __func__;
 }
 
 void WebGLRenderingContext::Clear(GLbitfield mask) {

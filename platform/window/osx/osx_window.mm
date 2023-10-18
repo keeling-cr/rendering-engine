@@ -57,7 +57,6 @@ static bool InitializeAppKit() {
 
     // Set our status to "started" so we are not bouncing in the doc and can activate
     [NSApp finishLaunching];
-    LOG(ERROR) << "keilingnica " << __func__;
     return true;
 }
 
@@ -73,7 +72,6 @@ bool OSXWindow::InitializeImpl(const std::string &name, int width, int height) {
         return false;
     }
 
-    // LOG(ERROR) << "keilingnica " << __func__;
     unsigned int styleMask = NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask |
                              NSMiniaturizableWindowMask;
     window_ = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, width, height)
@@ -104,7 +102,6 @@ bool OSXWindow::InitializeImpl(const std::string &name, int width, int height) {
     y_      = 0;
     width_  = width;
     height_ = height;
-    LOG(ERROR) << "keilingnica " << __func__;
 
     return true;
 }
