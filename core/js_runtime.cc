@@ -13,6 +13,7 @@
 #include "binding/modules/webgl/webgl_rendering_context.h"
 #include "binding/modules/webgl/webgl_buffer.h"
 #include "binding/modules/webgl/webgl_renderbuffer.h"
+#include "binding/modules/webgl/webgl_framebuffer.h"
 #include "binding/modules/webgl/webgl_shader.h"
 #include "binding/modules/webgl/webgl_program.h"
 
@@ -67,6 +68,7 @@ void JSRuntime::InstallBuiltinModule() {
     REGISTER(WebGLShader);
     REGISTER(WebGLProgram);
     REGISTER(WebGLRenderbuffer);
+    REGISTER(WebGLFramebuffer);
 #undef REGISTER
 }
     
@@ -76,7 +78,7 @@ void JSRuntime::EvaluateJavascriptSource(const std::string& source) {
     
     v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
     if (ctx.IsEmpty()) 
-        LOG(ERROR) << "keiling current context is empty";
+        LOG(ERROR) << "Current context is empty!!!";
 
     v8::Local<v8::Context> context = js_context_->context();
     TryCatch try_catch(isolate);

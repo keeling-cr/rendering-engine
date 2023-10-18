@@ -19,7 +19,7 @@ const int kAngleStencilBits = 8;
 void CanvasNew(const v8::FunctionCallbackInfo<v8::Value>& args) {
     v8::Isolate* isolate = args.GetIsolate();
     v8::HandleScope handle_scope(isolate);
-
+    LOG(ERROR) << "keiling " << __func__;
     if (!args.IsConstructCall()) {
         isolate->ThrowError("Canvas must be constructed with new");
         return;
@@ -95,6 +95,7 @@ void Canvas::SwapBufferForTest() {
 nica::FunctionTemplateBuilder 
 Canvas::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
+    LOG(ERROR) << "keiling " << __func__;
     nica::FunctionTemplateBuilder builder(isolate, CanvasNew);
     builder.SetMethod("getContext", &Canvas::GetContext);
     builder.SetMethod("swapBufferForTest", &Canvas::SwapBufferForTest);

@@ -7,6 +7,7 @@
 #include "binding/modules/webgl/webgl_shader.h"
 #include "binding/modules/webgl/webgl_program.h"
 #include "binding/modules/webgl/webgl_texture.h"
+#include "binding/modules/webgl/webgl_framebuffer.h"
 #include "binding/modules/webgl/webgl_renderbuffer.h"
 #include "binding/modules/webgl/webgl_any.h"
 #include "base/logging.h"
@@ -280,6 +281,12 @@ void WebGLRenderingContext::DeleteRenderbufferInMap(WebGLRenderbuffer* renderbuf
     delete renderbuffer;
 }
 
+void WebGLRenderingContext::DeleteFramebufferInMap(WebGLFramebuffer* framebuffer) {
+    if (!framebuffer) return;
+    framebuffer_map_.erase(framebuffer->webgl_id());
+    delete framebuffer;
+}
+
 bool WebGLRenderingContext::ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums) {
   switch (target) {
     case GL_TEXTURE_2D:
@@ -298,6 +305,47 @@ bool WebGLRenderingContext::ValidateTextureBinding(const char* function, GLenum 
   }
   return true;
 }
+
+bool WebGLRenderingContext::ValidateStencilFunc(const char* function, GLenum func) {
+    switch (func) {
+        case GL_NEVER:
+        case GL_LESS:
+        case GL_LEQUAL:
+        case GL_GREATER:
+        case GL_GEQUAL:
+        case GL_EQUAL:
+        case GL_NOTEQUAL:
+        case GL_ALWAYS:
+            return true;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return false;
+    }
+}
+
+bool WebGLRenderingContext::ValidateBlendFuncFactors(const char* function, GLenum src, GLenum dst) {
+  if (((src == GL_CONSTANT_COLOR || src == GL_ONE_MINUS_CONSTANT_COLOR)
+       && (dst == GL_CONSTANT_ALPHA || dst == GL_ONE_MINUS_CONSTANT_ALPHA))
+      || ((dst == GL_CONSTANT_COLOR || dst == GL_ONE_MINUS_CONSTANT_COLOR)
+          && (src == GL_CONSTANT_ALPHA || src == GL_ONE_MINUS_CONSTANT_ALPHA))) {
+    set_gl_error(GL_INVALID_OPERATION);
+    return false;
+  }
+  return true;
+}
+
+bool WebGLRenderingContext::ValidateBlendEquation(const char* function, GLenum mode) {
+  switch (mode) {
+    case GL_FUNC_ADD:
+    case GL_FUNC_SUBTRACT:
+    case GL_FUNC_REVERSE_SUBTRACT:
+      return true;
+    default:
+      set_gl_error(GL_INVALID_ENUM);
+      return false;
+  }
+}
+
 
 bool WebGLRenderingContext::ValidateObject(WebGLObjectInterface* object) {
     if (object && !object->ValidateContext(this)) {
@@ -520,6 +568,122 @@ void WebGLRenderingContext::RenderbufferStorage(GLenum target, GLenum internalfo
     glRenderbufferStorage(target, internalformat, width, height);
 }
 
+void WebGLRenderingContext::BindFramebuffer(GLenum target, WebGLFramebuffer* framebuffer) {
+    if (target != GL_FRAMEBUFFER) {
+        set_gl_error(GL_INVALID_ENUM);
+        return;
+    }
+    if (!ValidateObject(framebuffer)) return;
+
+    GLuint framebuffer_id = framebuffer ? framebuffer->webgl_id() : 0;
+    glBindFramebuffer(target, framebuffer_id);
+}
+
+GLenum WebGLRenderingContext::CheckFramebufferStatus(GLenum target) {
+    if (target != GL_FRAMEBUFFER) {
+        set_gl_error(GL_INVALID_ENUM);
+        return static_cast<uint32_t>(0);
+    }
+    return glCheckFramebufferStatus(target);
+}
+
+WebGLFramebuffer* WebGLRenderingContext::CreateFramebuffer() {
+    GLuint framebuffer_id = 0;
+    glGenFramebuffers(1, &framebuffer_id);
+    WebGLFramebuffer* framebuffer = new WebGLFramebuffer(GetIsolate(), this, framebuffer_id);
+    framebuffer_map_[framebuffer_id] = framebuffer;
+    return framebuffer;
+}
+
+void WebGLRenderingContext::DeleteFramebuffer(WebGLFramebuffer* framebuffer) {
+    if (!ValidateObject(framebuffer)) return;
+    GLuint framebuffer_id = framebuffer ? framebuffer->webgl_id() : 0;
+    glDeleteFramebuffers(1, &framebuffer_id);
+    DeleteFramebufferInMap(framebuffer);
+}
+
+// nica::ScriptValue GetFramebufferAttachmentParameter(GLenum target, GLenum attachment, GLenum pname) {
+
+// }
+
+void WebGLRenderingContext::BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
+    glBlendColor(red, green, blue, alpha);
+}
+
+void WebGLRenderingContext::BlendEquation(GLenum mode) {
+    glBlendEquation(mode);
+}
+
+void WebGLRenderingContext::BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha) {
+    if (!ValidateBlendEquation("blendEquationSeparate", modeRGB))
+        return;
+    
+    if (!ValidateBlendEquation("blendEquationSeparate", modeAlpha))
+        return;
+    glBlendEquationSeparate(modeRGB, modeAlpha);
+}
+
+void WebGLRenderingContext::BlendFunc(GLenum sfactor, GLenum dfactor) {
+    if (!ValidateBlendFuncFactors("blendFunc", sfactor, dfactor))
+        return;
+    glBlendFunc(sfactor, dfactor);
+    return;
+}
+
+void WebGLRenderingContext::BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) {
+    if (!ValidateBlendFuncFactors("blendFuncSeparate", srcRGB, dstRGB))
+        return;
+    glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+}
+
+void WebGLRenderingContext::StencilFunc(GLenum func, GLint ref, GLuint mask) {
+    if (!ValidateStencilFunc("stencilFunc", func))
+        return;
+    glStencilFunc(func, ref, mask);
+}
+
+void WebGLRenderingContext::StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask) {
+    switch (face) {
+        case GL_FRONT_AND_BACK:
+        case GL_FRONT:
+        case GL_BACK:
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return;
+  }
+
+  if (!ValidateStencilFunc("stencilFuncSeparate", func))
+    return;
+
+  glStencilFuncSeparate(face, func, ref, mask);
+}
+
+void WebGLRenderingContext::StencilMask(GLuint mask) {
+    glStencilMask(mask);
+}
+
+void WebGLRenderingContext::StencilMaskSeparate(GLenum face, GLuint mask) {
+    switch (face) {
+        case GL_FRONT_AND_BACK:
+        case GL_FRONT:
+        case GL_BACK:
+            break;
+        default:
+            set_gl_error(GL_INVALID_ENUM);
+            return;
+    }
+    glStencilMaskSeparate(face, mask);
+}
+
+void WebGLRenderingContext::StencilOp(GLenum fail, GLenum zfail, GLenum zpass) {
+    glStencilOp(fail, zfail, zpass);
+}
+
+void WebGLRenderingContext::StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass) {
+    glStencilOpSeparate(face, fail, zfail, zpass);
+}
+
 nica::FunctionTemplateBuilder 
 WebGLRenderingContext::GetFunctionTemplateBuilder(
     v8::Isolate* isolate) {
@@ -553,7 +717,21 @@ WebGLRenderingContext::GetFunctionTemplateBuilder(
     builder.SetMethod("deleteRenderbuffer", &WebGLRenderingContext::DeleteRenderbuffer);
     builder.SetMethod("getRenderbufferParameter", &WebGLRenderingContext::GetRenderbufferParameter);
     builder.SetMethod("isRenderbuffer", &WebGLRenderingContext::IsRenderbuffer);
-    builder.SetMethod("renderbufferStorage", &WebGLRenderingContext::RenderbufferStorage);
+    builder.SetMethod("bindFramebuffer", &WebGLRenderingContext::BindFramebuffer);
+    builder.SetMethod("checkFramebufferStatus", &WebGLRenderingContext::CheckFramebufferStatus);
+    builder.SetMethod("createFramebuffer", &WebGLRenderingContext::CreateFramebuffer);
+    builder.SetMethod("deleteFramebuffer", &WebGLRenderingContext::DeleteFramebuffer);
+    builder.SetMethod("blendColor", &WebGLRenderingContext::BlendColor);
+    builder.SetMethod("blendEquation", &WebGLRenderingContext::BlendEquation);
+    builder.SetMethod("blendEquationSeparate", &WebGLRenderingContext::BlendEquationSeparate);
+    builder.SetMethod("blendFunc", &WebGLRenderingContext::BlendFunc);
+    builder.SetMethod("blendFuncSeparate", &WebGLRenderingContext::BlendFuncSeparate);
+    builder.SetMethod("stencilFunc", &WebGLRenderingContext::StencilFunc);
+    builder.SetMethod("stencilFuncSeparate", &WebGLRenderingContext::StencilFuncSeparate);
+    builder.SetMethod("stencilMask", &WebGLRenderingContext::StencilMask);
+    builder.SetMethod("stencilMaskSeparate", &WebGLRenderingContext::StencilMaskSeparate);
+    builder.SetMethod("stencilOp", &WebGLRenderingContext::StencilOp);
+    builder.SetMethod("stencilOpSeparate", &WebGLRenderingContext::StencilOpSeparate);
 
 #define WEBGL_CONSTANT(name, val) builder.SetValue(#name, val)
 #include "binding/modules/webgl/webgl_context_const_value.h"    

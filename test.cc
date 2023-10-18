@@ -15,13 +15,17 @@
 int main(int argc, char *argv[]) {
     platform::InitPlatformWindow("nica", 1000, 1000);
 
+    LOG(ERROR) << "keilingnica main0 ";
     bool running   = true;
     nica::JSRuntime runtime;
     nica::JSRuntime::Scope runtime_scope(&runtime);
     runtime.EvaluateJavascriptSource("'Hello' + ', World!'");
+
+    LOG(ERROR) << "keilingnica main1 ";
     if (argc > 0) {
-        LOG(ERROR) << "keilingnica " << argv[1];
-        runtime.EvaluateJavascriptFile(base::FilePath(argv[2]));
+        LOG(ERROR) << "keilingnica main2 " << argv[1];
+        // LOG(ERROR) << "keilingnica " << argv[2];
+        runtime.EvaluateJavascriptFile(base::FilePath(argv[1]));
     }
     platform::OSWindow* window = platform::GetPlatformWindow();
     while (running) {

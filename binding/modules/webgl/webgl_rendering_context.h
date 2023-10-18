@@ -13,6 +13,7 @@
 namespace bind {
 
 class WebGLBuffer;
+class WebGLFramebuffer;
 class WebGLShader;
 class WebGLProgram;
 class WebGLRenderbuffer;
@@ -64,24 +65,47 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     nica::ScriptValue GetRenderbufferParameter(GLenum target, GLenum pname);
     bool IsRenderbuffer(WebGLRenderbuffer* renderbuffer);
     void RenderbufferStorage(GLenum target, GLenum internalFormat, GLsizei width, GLsizei height);
+
+    void BindFramebuffer(GLenum target, WebGLFramebuffer* framebuffer);
+    GLenum CheckFramebufferStatus(GLenum target);
+    WebGLFramebuffer* CreateFramebuffer();
+    void DeleteFramebuffer(WebGLFramebuffer* framebuffer);
+    // nica::ScriptValue GetFramebufferAttachmentParameter(GLenum target, GLenum attachment, GLenum pname);
+
+    void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+    void BlendEquation(GLenum mode);
+    void BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha);
+    void BlendFunc(GLenum sfactor, GLenum dfactor);
+    void BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha);
+
+    void StencilFunc(GLenum func, GLint ref, GLuint mask);
+    void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask);
+    void StencilMask(GLuint mask);
+    void StencilMaskSeparate(GLenum face, GLuint mask);
+    void StencilOp(GLenum fail, GLenum zfail, GLenum zpass);
+    void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass);
+
     void Clear(GLbitfield mask);
     void Enable(GLenum cap);
     void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
     void DrawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset);
     void DrawArrays(GLenum mode, GLint first, GLsizei count);
   private:
+    bool ValidateStencilFunc(const char* function, GLenum func);
+    bool ValidateBlendFuncFactors(const char* function, GLenum src, GLenum dst);
+    bool ValidateBlendEquation(const char* function, GLenum mode);
     bool ValidateTextureBinding(const char* function, GLenum target, bool use_six_enums);
     bool ValidateCapability(const char* function, GLenum cap);
     bool ValidateObject(WebGLObjectInterface* object);
     bool ValidateBufferDataParameters(const char* function, GLenum target, GLenum usage);
     bool RequireObject(const void* object);
 
-
     void DeleteBufferInMap(WebGLBuffer* buffer);
     void DeleteShaderInMap(WebGLShader* shader);
     void DeleteProgramInMap(WebGLShader* program);
     void DeleteTextureInMap(WebGLTexture* texture);
     void DeleteRenderbufferInMap(WebGLRenderbuffer* renderbuffer);
+    void DeleteFramebufferInMap(WebGLFramebuffer* framebuffer);
 
     template<class T>
     void DeleteMapObjects(std::map<GLuint, T*>& map) {
@@ -100,6 +124,7 @@ class WebGLRenderingContext : public nica::V8Object<WebGLRenderingContext> {
     std::map<GLuint, WebGLProgram*> program_map_;
     std::map<GLuint, WebGLTexture*> texture_map_;
     std::map<GLuint, WebGLRenderbuffer*> renderbuffer_map_;
+    std::map<GLuint, WebGLFramebuffer*> framebuffer_map_;
 };
 
 } // namespace bind
