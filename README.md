@@ -22,14 +22,13 @@
 8. v8 头文件引用规范
 9. 支持 messagepump
 10. support gesture input
+11. 支持 vsync 信号，实现 requestAnimation
 
 ## base library
 - refcount
 - sequence checker
 
-
 ## DEMO 形态
-
 1. 支持 texture/renderbuffer/framebuffer/shader
 2. 简单画一个三角形
 
