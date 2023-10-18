@@ -89,6 +89,8 @@ class Arguments {
   void ThrowTypeError(const std::string& message) const;
 
   v8::Isolate* isolate() const { return isolate_; }
+  const v8::FunctionCallbackInfo<v8::Value>* function_callback_info() { return info_for_function_; }
+  const v8::PropertyCallbackInfo<v8::Value>* property_callback_info() { return info_for_property_; }
 
   bool IsConstructCall() const;
 

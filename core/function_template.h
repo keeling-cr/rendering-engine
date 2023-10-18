@@ -113,6 +113,22 @@ inline bool GetNextArgument(Arguments* args,
   return true;
 }
 
+inline bool GetNextArgument(Arguments* args,
+                            const InvokerOptions& invoker_options,
+                            bool is_first,
+                            v8::FunctionCallbackInfo<v8::Value>** result) {
+  *result = const_cast<v8::FunctionCallbackInfo<v8::Value>*>(args->function_callback_info());
+  return true;
+}
+
+inline bool GetNextArgument(Arguments* args,
+                            const InvokerOptions& invoker_options,
+                            bool is_first,
+                            v8::PropertyCallbackInfo<v8::Value>** result) {
+  *result = const_cast<v8::PropertyCallbackInfo<v8::Value>*>(args->property_callback_info());
+  return true;
+}
+
 void ThrowConversionError(Arguments* args,
                                      const InvokerOptions& invoker_options,
                                      size_t index);

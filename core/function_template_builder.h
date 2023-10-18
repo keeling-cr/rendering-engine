@@ -17,10 +17,11 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplateForFunction(v8::Isolate* i
                                                        T callback,
                                                        const char* type_name) {
   InvokerOptions options;
-  // todo(liqining): Suppoer non-member function using
-  // std::is_member_function_pointer
-  options.holder_is_first_argument = true;
-  options.holder_type = type_name;
+  if (std::is_member_function_pointer<T>::value) {
+    options.holder_is_first_argument = true;
+    options.holder_type = type_name;
+  }
+
   return ::nica::CreateFunctionTemplate(
       isolate, base::BindRepeating(std::move(callback)), std::move(options));
 }
